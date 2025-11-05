@@ -15,6 +15,7 @@ import argparse
 import json
 import time
 import random
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -336,8 +337,11 @@ def main():
     )
     parser.add_argument(
         "--token",
-        required=True,
-        help="CourtListener API token"
+        help="CourtListener API token (or set COURTLISTENER_TOKEN env var)"
+    )
+    parser.add_argument(
+        "--config",
+        help="Path to config file (JSON with 'api_token' field)"
     )
     parser.add_argument(
         "--strategy",
@@ -365,8 +369,33 @@ def main():
 
     args = parser.parse_args()
 
+    # Get API token from multiple sources (priority: CLI arg > config file > env var)
+    api_token = args.token
+
+    if not api_token and args.config:
+        try:
+            with open(args.config, 'r') as f:
+                config = json.load(f)
+                api_token = config.get('api_token')
+                print(f"Loaded API token from {args.config}")
+        except Exception as e:
+            print(f"Error loading config file: {e}")
+
+    if not api_token:
+        api_token = os.environ.get('COURTLISTENER_TOKEN')
+        if api_token:
+            print("Using API token from COURTLISTENER_TOKEN environment variable")
+
+    if not api_token:
+        print("Error: No API token provided!")
+        print("Please provide token via:")
+        print("  1. --token argument")
+        print("  2. --config config.json (with 'api_token' field)")
+        print("  3. COURTLISTENER_TOKEN environment variable")
+        return 1
+
     # Initialize sampler
-    sampler = CourtListenerSampler(api_token=args.token, target_count=args.count)
+    sampler = CourtListenerSampler(api_token=api_token, target_count=args.count)
 
     # Sample based on strategy
     print(f"\nUsing {args.strategy} sampling strategy...")

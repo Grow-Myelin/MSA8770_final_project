@@ -21,6 +21,7 @@ opinions.json
 .env
 *.token
 secrets.json
+config.json
 
 # IDE
 .vscode/
