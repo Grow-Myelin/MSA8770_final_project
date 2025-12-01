@@ -8,6 +8,22 @@
 
 **LangGraph ReAct Multi-Tool Agent**
 
+
+Data:
+
+This project uses a dataset of ~1,000 U.S. court opinions.
+
+The dataset is **NOT included** in this repository because:
+- it is too large for GitHub storage
+- CourtListener’s datasets may have usage/licensing restrictions
+  
+Source:
+The opinions were collected from **CourtListener** (https://www.courtlistener.com/)  using their public REST API.
+
+To run the system, download or generate your dataset and place it at:
+
+    data/summarization_extract_clean.csv
+
 ⚙️ Installation & Setup
 1. Create & Activate Virtual Environment
 python3 -m venv venv
