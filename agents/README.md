@@ -24,11 +24,17 @@ QDRANT_API_KEY=your_key_here
 
 📁 Project Structure
 agents/
+
   `rag_phase1.py`           # RAG: Retrieval + 4 legal modes
+  
   `NER_classifier.py `      # spaCy NER + metadata classification
+  
   `llm_cluster.py  `        # Cluster label lookup
+  
   `legal_tools.py`          # Wraps RAG + NER + Clustering as tools
+  
   `legal_graph_agent.py`    # Main LangGraph ReAct agent
+  
   `vector_db.py `           # create vectore data base of text embeddings and upsert in qdrant 
 
 ## Running the Agent
