@@ -42,11 +42,18 @@ def get_points(query_text: str, limit: int = 3):
 
 
 def build_context(points, max_chars: int = 3500):
+    """
+    Build a text context from Qdrant points.
+
+    Tries payload["text"], falls back to payload["text_clean"] if needed.
+    """
     chunks = []
     total = 0
-
     for p in points:
-        text = p.payload.get("text", "")
+        text = (
+            p.payload.get("text")
+            or p.payload.get("text_clean", "")
+        )
         if not text:
             continue
         if total + len(text) > max_chars:
@@ -55,7 +62,6 @@ def build_context(points, max_chars: int = 3500):
         total += len(text)
         if total >= max_chars:
             break
-
     return "\n---\n".join(chunks) if chunks else "No relevant context."
 
 
@@ -77,6 +83,8 @@ def get_system_prompt(mode: str) -> str:
 #   NER + METADATA HELPERS
 # -------------------------
 def run_spacy(text: str):
+    if not isinstance(text, str):
+        text = "" if text is None else str(text)
     header = text[:2000]
     doc = nlp(header)
     orgs = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
@@ -84,9 +92,10 @@ def run_spacy(text: str):
     return orgs, places
 
 
-def classify_area_of_law(text: str, orgs: list[str]):
+def classify_area_of_law(text: str, orgs):
+    if not isinstance(text, str):
+        text = "" if text is None else str(text)
     t = text.lower()
-    o = [x.lower() for x in orgs]
 
     if "easement" in t or "quiet title" in t:
         return "property"
@@ -106,6 +115,8 @@ def classify_area_of_law(text: str, orgs: list[str]):
 
 
 def classify_remedy_type(text: str):
+    if not isinstance(text, str):
+        text = "" if text is None else str(text)
     t = text.lower()
     r = []
     if "injunction" in t or "restraining order" in t:
@@ -118,18 +129,28 @@ def classify_remedy_type(text: str):
         r.append("benefits")
     if "administrative review" in t:
         r.append("administrative review")
-    return list(dict.fromkeys(r))  # dedupe
+    # dedupe while preserving order
+    return list(dict.fromkeys(r))
 
 
 # -------------------------
 #        RAG TOOL
 # -------------------------
 @tool
-def legal_rag(question: str, mode: str = "overview", k: int = 3):
+def legal_rag(arguments: dict):
     """
-    Retrieve relevant cases from Qdrant and answer using RAG.
-    Modes: overview, outcome, rules, reasoning.
+    Retrieve relevant case passages from Qdrant and answer a legal question.
+
+    arguments = {
+        "question": str,
+        "mode": str = "overview" | "outcome" | "rules" | "reasoning",
+        "k": int = 3
+    }
     """
+    question = arguments.get("question")
+    mode = arguments.get("mode", "overview")
+    k = arguments.get("k", 3)
+
     points = get_points(question, limit=k)
     context = build_context(points)
     system = get_system_prompt(mode)
@@ -138,21 +159,47 @@ def legal_rag(question: str, mode: str = "overview", k: int = 3):
         SystemMessage(content=system),
         HumanMessage(content=f"Question: {question}\n\nContext:\n{context}")
     ]
+
     resp = llm.invoke(messages)
     return resp.content
 
 
 # -------------------------
-#       NER TOOL
+#   METADATA TOOL (RAG-AWARE)
 # -------------------------
 @tool
-def extract_metadata(text: str):
+def extract_metadata(arguments: dict):
     """
-    Extract orgs, places, area of law, and remedy types from a case.
+    Extract metadata (organizations, places, area_of_law, remedy_type).
+
+    You can either:
+      - pass raw case text: {"text": "..."}
+      - OR let the tool retrieve context from Qdrant:
+            {"question": "...", "k": 5}
+
+    arguments = {
+        "text": str (optional),
+        "question": str (optional),
+        "k": int = 5 (optional, only with question)
+    }
     """
+    text = arguments.get("text")
+
+    # If no direct text, pull it via RAG using a question
+    if not text:
+        question = arguments.get("question")
+        if not question:
+            return {
+                "error": "Provide either 'text' or 'question' for metadata extraction."
+            }
+        k = arguments.get("k", 5)
+        points = get_points(question, limit=k)
+        text = build_context(points)
+
     orgs, places = run_spacy(text)
     area = classify_area_of_law(text, orgs)
     remedy = classify_remedy_type(text)
+
     return {
         "organizations": orgs,
         "places": places,
@@ -162,27 +209,66 @@ def extract_metadata(text: str):
 
 
 # -------------------------
-#     TOPIC / CLUSTER TOOL
+#       TOPIC TOOL 
 # -------------------------
-# These two lookup tables must already exist (built in notebook)
 try:
-    df_clusters = pd.read_csv("./data/cluster_labels.csv")
-except:
+    # cluster_labels.csv has: cluster_id, label, description
+    labels_df = pd.read_csv("./data/cluster_labels.csv")
+
+    # cluster_stats.csv has: cluster_id, n_cases, sample_case, area_mode
+    stats_df = pd.read_csv("./data/cluster_stats.csv")
+
+    # Merge to get label + description + sample_case in one table
+    df_clusters = labels_df.merge(
+        stats_df[["cluster_id", "sample_case"]],
+        on="cluster_id",
+        how="left"
+    )
+
+    # Ensure cluster_id is int
+    if "cluster_id" in df_clusters.columns:
+        df_clusters["cluster_id"] = df_clusters["cluster_id"].astype(int)
+except Exception:
     df_clusters = pd.DataFrame()
 
+
 @tool
-def explore_topic(cluster_id: int):
+def explore_topic(arguments: dict):
     """
-    Return the cluster label + description + a few sample cases.
+    Look up information about a cluster.
+
+    arguments = { "cluster_id": int }
+
+    Returns:
+        {
+            "cluster_id": int,
+            "label": str,
+            "description": str,
+            "sample_case": str | None
+        }
     """
+    if df_clusters.empty:
+        return "Cluster metadata not available (cluster_labels.csv / cluster_stats.csv missing or unreadable)."
+
+    cluster_id = arguments.get("cluster_id")
+
+    if cluster_id is None:
+        return "You must provide 'cluster_id' in arguments, e.g. {\"cluster_id\": 3}."
+
+    # Make sure we compare ints
+    try:
+        cluster_id = int(cluster_id)
+    except ValueError:
+        return f"Invalid cluster_id: {cluster_id}"
+
     if cluster_id not in df_clusters["cluster_id"].tolist():
-        return f"Cluster {cluster_id} not found."
+        return f"Cluster {cluster_id} not found in cluster_labels/cluster_stats."
 
     row = df_clusters[df_clusters["cluster_id"] == cluster_id].iloc[0]
 
     return {
         "cluster_id": int(row["cluster_id"]),
-        "label": row["cluster_label"],
-        "description": row["cluster_description"],
-        "sample_case": row["sample_case"]
+        "label": row["label"],
+        "description": row["description"],
+        "sample_case": row.get("sample_case", None),
     }
