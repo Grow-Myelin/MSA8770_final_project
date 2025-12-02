@@ -1,125 +1,129 @@
-# This project implements a multi-agent system for analyzing legal case texts using:
+# 🧠⚖️ Multi-Agent Legal Case Analysis
 
-**RAG (Retrieval-Augmented Generation)**
+This project implements a **multi-agent system** for analyzing U.S. appellate opinions using:
 
-**NER + Metadata Extraction (spaCy)**
+- **RAG (Retrieval-Augmented Generation)** over a Qdrant vector DB  
+- **spaCy NER + rule-based metadata extraction**  
+- **LLM-labeled clustering** (KMeans + GPT)  
+- A small **LangGraph ReAct + memory demo**
 
-**LLM-based Clustering**
+The system shows how different agents can give complementary views of the *same* case:
+- doctrinal rules / standards of review (RAG),
+- corpus-level topic/cluster,
+- structured metadata (area of law, remedies, orgs, places).
 
-**LangGraph ReAct Multi-Tool Agent**
+---
 
+## 📚 Data
 
-Data:
+The original dataset (~1,000 opinions) is **not included** because of size and licensing.
 
-This project uses a dataset of ~1,000 U.S. court opinions.
+- Source: [CourtListener](https://www.courtlistener.com/) REST API.
+- Expected input:  
+  `data/summarization_extract_clean.csv` (case texts + ids).
 
-The dataset is **NOT included** in this repository because:
-- it is too large for GitHub storage
-- CourtListener’s datasets may have usage/licensing restrictions
-  
-Source:
-The opinions were collected from **CourtListener** (https://www.courtlistener.com/)  using their public REST API.
+The preprocessing scripts (not required to run the demo, but included) generate:
 
-To run the system, download or generate your dataset and place it at:
+- `data/summarization_with_metadata.csv`
+- `data/summarization_with_metadata_clusters.csv`
+- `data/cluster_stats.csv`
+- `data/cluster_labels.csv`
 
-    data/summarization_extract_clean.csv
+---
 
-⚙️ Installation & Setup
-1. Create & Activate Virtual Environment
+## ⚙️ Setup
+
+```bash
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate          # Windows: venv\Scripts\activate
 
-2. Install Dependencies
-pip install qdrant-client langchain-openai langgraph spacy scikit-learn python-dotenv pandas
+pip install \
+  qdrant-client \
+  langchain-openai \
+  langchain-ollama \
+  langgraph \
+  spacy \
+  scikit-learn \
+  python-dotenv \
+  pandas \
+  numpy
+
 python -m spacy download en_core_web_sm
 
-3. Environment Variables
-Create a .env file in the project root:
-OPENAI_API_KEY=your_key_here
-QDRANT_API_KEY=your_key_here
+create .env 
+OPENAI_API_KEY=your_openai_key_here
+QDRANT_API_KEY=your_qdrant_key_here
 
-📁 Project Structure
-agents/
 
-  `rag_phase1.py`           # RAG: Retrieval + 4 legal modes
-  
-  `NER_classifier.py `      # spaCy NER + metadata classification
-  
-  `llm_cluster.py  `        # Cluster label lookup
-  
-  `legal_tools.py`          # Wraps RAG + NER + Clustering as tools
-  
-  `legal_graph_agent.py`    # Main LangGraph ReAct agent
-  
-  `vector_db.py `           # create vectore data base of text embeddings and upsert in qdrant 
 
-## Running the Agent
+Core Components
+agents/legal_tools.py
 
-Activate environment (if not already):
+Defines three tools used by all agents:
+
+legal_rag(arguments: {question, mode, k})
+
+Retrieves relevant passages from Qdrant and answers legal questions
+
+Modes: "overview", "outcome", "rules", "reasoning"
+
+extract_metadata(arguments: {text? | question?, k?})
+
+Either takes raw text, or uses RAG with a question
+
+Returns: organizations, places, area_of_law, remedy_type
+
+explore_topic(arguments: {cluster_id})
+
+Uses cluster_labels.csv + cluster_stats.csv
+
+Returns: cluster_id, label, description
+
+agents/cluster_agent.py
+
+Given a case_id, looks it up in the clustered CSV
+
+Calls explore_topic and returns a short, human-readable explanation of the case’s cluster/topic
+
+agents/metadata_agent.py
+
+Given a case_id, retrieves its text
+
+Calls extract_metadata and returns area of law, remedies, orgs, places
+
+agents/legal_agent.py (main demo)
+
+Runs the three-agent pipeline for a chosen case:
+
+Q1 – Doctrinal / RAG
+Uses legal_rag to answer:
+
+“What standard of review applies in unemployment-benefit administrative appeals?”
+
+Q2 – Cluster / Topic
+Uses explain_case_cluster(CASE_ID) to show cluster id, label, and description.
+
+Q3 – Metadata / Classifier
+Uses explain_case_metadata(CASE_ID) to show area_of_law, remedies, orgs, places.
+
+At the end of the script there is also a 2-turn LangGraph memory demo using MemorySaver:
+
+Turn 1: standard-of-review question
+
+Turn 2: follow-up about remedies / area of law, relying on the same conversation context.
+
+Activate the environment and run:
 
 source venv/bin/activate
-
-Run the main agent: ( make sure legal_tools.py is in the directory)
-
-python agents/legal_langgraph_agent.py
+python agents/legal_agent.py
 
 
-You should see:
+You will see:
 
-🚀 LangGraph Legal Agent Ready
-🔧 Tool called: legal_rag
-========== FINAL ANSWER ==========
-...
+Q1: STANDARD OF REVIEW – doctrinal/RAG rules
 
-🧪 Example Queries
+Q2: CLUSTER & TOPIC – semantic cluster explanation
 
-You can ask the agent things like:
+Q3: METADATA – area of law, remedies, orgs, places
 
-What legal rule applies in the prescriptive easement case?
-
-
-The agent will automatically decide whether to use:
-
-RAG retrieval
-
-Metadata extraction
-
-Topic/cluster exploration
-
-🛠️ What Each Script Does
-rag_phase1.py
-
-RAG pipeline that:
-
-Retrieves relevant cases from Qdrant , Builds grounded context , Answers in 4 legal modes:
-
-overview
-
-outcome
-
-rules
-
-reasoning
-
-NER_classifier.py Extracts: ORGs
-
-Places (GPE/LOC)
-
-Area of law
-
-Remedy type
-
-llm_cluster.py Returns: Cluster label , Cluster description
-
-legal_tools.py Wraps all components as tools so LangGraph can call them
-
-
-legal_langgraph_agent.py: The final LangGraph ReAct agent that orchestrates:
-
-The RAG tool
-
-The NER/metadata tool
-
-The topic/cluster tool
-
-It handles reasoning, tool-calling, and final answer generation.
+MEMORY DEMO – two-turn session showing short-term memory across turns.
