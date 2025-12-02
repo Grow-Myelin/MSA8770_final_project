@@ -56,7 +56,7 @@ QDRANT_API_KEY=your_qdrant_key_here
 
 ```
 
-Core Components
+# Core Components
 
 `agents/legal_tools.py`
 
@@ -76,13 +76,13 @@ Returns: cluster_id, label, description
 
 Calls explore_topic and returns a short, human-readable explanation of the case’s cluster/topic
 
-agents/metadata_agent.py Given a case_id, retrieves its text
+`agents/metadata_agent.py`  Given a case_id, retrieves its text
 
 Calls extract_metadata and returns area of law, remedies, orgs, places
 
 `agents/legal_agent.py` (main demo)
 
-Runs the three-agent pipeline for a chosen case:
+## Runs the three-agent pipeline for a chosen case:
 
 Q1 – Doctrinal / RAG
 Uses legal_rag to answer:
@@ -101,13 +101,15 @@ Turn 1: standard-of-review question
 
 Turn 2: follow-up about remedies / area of law, relying on the same conversation context.
 
+```
 Activate the environment and run:
 
 source venv/bin/activate
 python agents/legal_agent.py
 
+```
 
-You will see:
+**You will see:**
 
 Q1: STANDARD OF REVIEW – doctrinal/RAG rules
 
