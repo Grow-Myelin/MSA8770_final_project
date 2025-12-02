@@ -54,9 +54,10 @@ create .env
 OPENAI_API_KEY=your_openai_key_here
 QDRANT_API_KEY=your_qdrant_key_here
 
-
+---
 
 Core Components
+
 agents/legal_tools.py
 
 Defines three tools used by all agents:
