@@ -54,44 +54,33 @@ create .env
 OPENAI_API_KEY=your_openai_key_here
 QDRANT_API_KEY=your_qdrant_key_here
 
+```
 
 Core Components
 
-agents/legal_tools.py
+`agents/legal_tools.py`
 
-Defines three tools used by all agents:
+Defines three tools used by all agents: legal_rag(arguments: {question, mode, k})
 
-legal_rag(arguments: {question, mode, k})
+Retrieves relevant passages from Qdrant and answers legal questions Modes: "overview", "outcome", "rules", "reasoning"
 
-Retrieves relevant passages from Qdrant and answers legal questions
-
-Modes: "overview", "outcome", "rules", "reasoning"
-
-extract_metadata(arguments: {text? | question?, k?})
-
-Either takes raw text, or uses RAG with a question
+extract_metadata(arguments: {text? | question?, k?}) Either takes raw text, or uses RAG with a question
 
 Returns: organizations, places, area_of_law, remedy_type
 
-explore_topic(arguments: {cluster_id})
-
-Uses cluster_labels.csv + cluster_stats.csv
+explore_topic(arguments: {cluster_id}) Uses cluster_labels.csv + cluster_stats.csv
 
 Returns: cluster_id, label, description
 
-agents/cluster_agent.py
-
-Given a case_id, looks it up in the clustered CSV
+`agents/cluster_agent.py`  Given a case_id, looks it up in the clustered CSV
 
 Calls explore_topic and returns a short, human-readable explanation of the case’s cluster/topic
 
-agents/metadata_agent.py
-
-Given a case_id, retrieves its text
+agents/metadata_agent.py Given a case_id, retrieves its text
 
 Calls extract_metadata and returns area of law, remedies, orgs, places
 
-agents/legal_agent.py (main demo)
+`agents/legal_agent.py` (main demo)
 
 Runs the three-agent pipeline for a chosen case:
 
@@ -127,3 +116,4 @@ Q2: CLUSTER & TOPIC – semantic cluster explanation
 Q3: METADATA – area of law, remedies, orgs, places
 
 MEMORY DEMO – two-turn session showing short-term memory across turns.
+
