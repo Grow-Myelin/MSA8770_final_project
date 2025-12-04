@@ -17,6 +17,9 @@ corpus/
 *.jsonl
 opinions.json
 
+# Generated data
+data/
+
 # API tokens and secrets
 .env
 *.token
@@ -39,3 +42,4 @@ Thumbs.db
 
 # Logs
 *.log
+logs/sessions/

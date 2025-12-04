@@ -52,8 +52,8 @@ def run_spacy(text: str):
 # ---------
 def classify_area_of_law(text: str, orgs: list[str]) -> str | None:
     """
-    Very rough heuristic classifier for area of law.
-    You can refine this once you inspect more cases.
+    Heuristic classifier for area of law based on keywords.
+    Returns the most likely area of law or None if uncertain.
     """
     if not isinstance(text, str):
         text = "" if pd.isna(text) else str(text)
@@ -61,54 +61,129 @@ def classify_area_of_law(text: str, orgs: list[str]) -> str | None:
 
     orgs_lower = [o.lower() for o in orgs]
 
-    # Property law
-    if ("prescriptive easement" in t
-        or "easement by prescription" in t
-        or "easement" in t and "landlocked" in t
-        or "quiet title" in t):
-        return "property"
-
-    # Employment / Unemployment / Labor
-    if ("unemployment benefits" in t
-        or "employment security" in t
-        or "wrongful termination" in t
-        or any("employment security" in o for o in orgs_lower)):
-        return "employment"
-
-    # Administrative / agency review
-    if ("administrative review" in t
-        or "board of review" in t
-        or "agency decision" in t
-        or "administrative agency" in t):
-        return "administrative"
-
-    # Criminal
-    if ("defendant was convicted" in t
-        or "sentenced to" in t
-        or "indictment" in t
-        or "felony" in t):
+    # Criminal law (check early - common category)
+    if any(kw in t for kw in [
+        "defendant was convicted", "criminal conviction", "sentenced to",
+        "indictment", "felony", "misdemeanor", "criminal defendant",
+        "plea agreement", "plea bargain", "guilty verdict", "not guilty",
+        "prison", "incarceration", "probation", "parole",
+        "murder", "manslaughter", "robbery", "burglary", "assault",
+        "drug offense", "possession of", "trafficking"
+    ]):
         return "criminal"
 
+    # Constitutional law
+    if any(kw in t for kw in [
+        "first amendment", "second amendment", "fourth amendment",
+        "fifth amendment", "fourteenth amendment", "due process",
+        "equal protection", "constitutional right", "civil rights",
+        "free speech", "freedom of religion", "establishment clause",
+        "search and seizure", "miranda", "habeas corpus"
+    ]):
+        return "constitutional"
+
+    # Environmental law
+    if any(kw in t for kw in [
+        "environmental protection", "clean air act", "clean water act",
+        "epa", "environmental impact", "pollution", "hazardous waste",
+        "endangered species", "nepa", "environmental review"
+    ]) or "environmental protection agency" in t:
+        return "environmental"
+
+    # Immigration law
+    if any(kw in t for kw in [
+        "immigration", "deportation", "asylum", "refugee",
+        "naturalization", "visa", "uscis", "removal proceedings",
+        "alien", "lawful permanent resident", "green card"
+    ]):
+        return "immigration"
+
+    # Regulatory / Administrative law
+    if any(kw in t for kw in [
+        "administrative review", "board of review", "agency decision",
+        "administrative agency", "rulemaking", "regulatory",
+        "nuclear regulatory", "nrc", "fcc", "sec", "ftc",
+        "administrative procedure act", "arbitrary and capricious",
+        "chevron deference", "agency interpretation"
+    ]):
+        return "administrative"
+
+    # Labor / Employment law
+    if any(kw in t for kw in [
+        "unemployment benefits", "employment security", "wrongful termination",
+        "workplace discrimination", "title vii", "ada", "fmla",
+        "labor relations", "nlrb", "collective bargaining", "union",
+        "wage and hour", "flsa", "osha", "workplace safety",
+        "employment discrimination", "hostile work environment"
+    ]) or any("employment security" in o for o in orgs_lower):
+        return "employment"
+
+    # Property law
+    if any(kw in t for kw in [
+        "prescriptive easement", "easement by prescription", "quiet title",
+        "adverse possession", "eminent domain", "condemnation",
+        "zoning", "land use", "property rights", "trespass",
+        "landlord", "tenant", "lease", "eviction", "foreclosure",
+        "mortgage", "deed", "title insurance", "real property"
+    ]):
+        return "property"
+
     # Family law
-    if ("dissolution of marriage" in t
-        or "custody" in t
-        or "child support" in t
-        or "visitation" in t):
+    if any(kw in t for kw in [
+        "dissolution of marriage", "divorce", "custody", "child support",
+        "visitation", "alimony", "spousal support", "adoption",
+        "paternity", "parental rights", "child welfare", "dcfs",
+        "guardianship", "domestic relations"
+    ]):
         return "family"
 
     # Torts
-    if ("negligence" in t
-        or "duty of care" in t
-        or "personal injury" in t
-        or "tort" in t):
+    if any(kw in t for kw in [
+        "negligence", "duty of care", "personal injury", "tort",
+        "malpractice", "medical malpractice", "legal malpractice",
+        "products liability", "defamation", "libel", "slander",
+        "intentional infliction", "wrongful death", "premises liability",
+        "negligent", "proximate cause", "damages"
+    ]):
         return "torts"
 
     # Contracts
-    if ("breach of contract" in t
-        or "contract dispute" in t
-        or "lease agreement" in t
-        or "promissory" in t):
+    if any(kw in t for kw in [
+        "breach of contract", "contract dispute", "lease agreement",
+        "promissory", "contractual obligation", "specific performance",
+        "breach of warranty", "unjust enrichment", "quasi-contract",
+        "contract interpretation", "parol evidence"
+    ]):
         return "contracts"
+
+    # Intellectual Property
+    if any(kw in t for kw in [
+        "patent", "trademark", "copyright", "trade secret",
+        "infringement", "intellectual property", "licensing agreement"
+    ]):
+        return "intellectual_property"
+
+    # Tax law
+    if any(kw in t for kw in [
+        "tax court", "irs", "income tax", "tax liability",
+        "tax refund", "tax assessment", "internal revenue"
+    ]):
+        return "tax"
+
+    # Bankruptcy
+    if any(kw in t for kw in [
+        "bankruptcy", "chapter 7", "chapter 11", "chapter 13",
+        "debtor", "creditor", "discharge", "reorganization"
+    ]):
+        return "bankruptcy"
+
+    # Civil procedure (catch-all for procedural matters)
+    if any(kw in t for kw in [
+        "summary judgment", "motion to dismiss", "class action",
+        "jurisdiction", "standing", "statute of limitations",
+        "res judicata", "collateral estoppel"
+    ]):
+        return "civil_procedure"
 
     # Catch-all if nothing matched
     return None

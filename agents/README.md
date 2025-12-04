@@ -50,9 +50,9 @@ pip install \
 
 python -m spacy download en_core_web_sm
 
-create .env 
-OPENAI_API_KEY=your_openai_key_here
-QDRANT_API_KEY=your_qdrant_key_here
+# Create .env file in project root with:
+OPENAI_API_KEY=sk-your-openai-key-here
+QDRANT_API_KEY=your-qdrant-api-key-here
 
 ```
 

@@ -1,254 +1,134 @@
-# CourtListener Corpus Sampler
+# MSA8770 Multi-Agent Legal Analysis System
 
-A Python tool to sample 1000 documents from the CourtListener.com API for legal corpus creation.
+A multi-agent system for analyzing U.S. appellate court opinions, combining RAG, NLP entity extraction, and LLM-based clustering.
 
 ## Overview
 
-This project provides a flexible sampling tool for collecting court opinions from CourtListener.com, a comprehensive database of U.S. legal opinions. The tool supports multiple sampling strategies to ensure corpus diversity.
+This system provides three complementary analytical views of legal cases:
 
-## Features
+| Agent | Purpose | Technology |
+|-------|---------|------------|
+| **RAG Agent** | Doctrinal questions, standards of review | Qdrant vector DB + OpenAI |
+| **Metadata Agent** | Entity extraction (orgs, places, remedies) | spaCy NER + rules |
+| **Cluster Agent** | Topic/theme classification | KMeans + GPT labeling |
 
-- **Multiple Sampling Strategies**:
-  - **Sequential**: Simple pagination through results
-  - **Stratified**: Temporal diversity by sampling across different time periods
-  - **Diverse**: Jurisdictional diversity by sampling from different court types
+The system includes a **FastAPI web dashboard** for interactive querying and a **LangGraph memory demo** for multi-turn conversations.
 
-- **Rate Limiting**: Respects CourtListener's 5,000 requests/hour limit
-- **Multiple Output Formats**: JSON and JSONL
-- **Metadata Tracking**: Automatically generates metadata about the corpus
+## Architecture
 
-## Prerequisites
+```
+┌─────────────────────────────────────────┐
+│     Web Dashboard (localhost:8000)      │
+│     FastAPI + Jinja2 HTML interface     │
+└──────────────┬──────────────────────────┘
+               │
+    ┌──────────┼──────────┐
+    │          │          │
+    ↓          ↓          ↓
+┌────────┐ ┌──────────┐ ┌─────────────┐
+│  RAG   │ │ Metadata │ │  Cluster    │
+│ Agent  │ │  Agent   │ │   Agent     │
+└────┬───┘ └────┬─────┘ └──────┬──────┘
+     │          │              │
+     ↓          ↓              ↓
+ Qdrant DB   spaCy NER    KMeans + GPT
+     │          │              │
+     └──────────┴──────────────┘
+                │
+    ┌───────────┴───────────┐
+    │  1,105 Legal Opinions │
+    │  (CourtListener.com)  │
+    └───────────────────────┘
+```
 
-1. **CourtListener API Token**: You need a free account at [courtlistener.com](https://www.courtlistener.com)
-   - Sign up at: https://www.courtlistener.com/sign-in/register/
-   - Get your API token from: https://www.courtlistener.com/api/rest-info/
+## Quick Start
 
-2. **Python 3.7+**
-
-## Installation
+### 1. Setup Environment
 
 ```bash
-# Install dependencies
+cd MSA8770_final_project
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-
-# Make the script executable (optional)
-chmod +x courtlistener_sampler.py
+python -m spacy download en_core_web_sm
 ```
 
-## Usage
+### 2. Configure API Keys
 
-### Basic Usage
+Create `.env` in the project root:
+
+```
+OPENAI_API_KEY=your_openai_key_here
+QDRANT_API_KEY=your_qdrant_key_here
+```
+
+### 3. Run the Web Dashboard
 
 ```bash
-# Sequential sampling (simplest approach)
-python courtlistener_sampler.py --token YOUR_API_TOKEN --strategy sequential
-
-# Stratified sampling (temporal diversity)
-python courtlistener_sampler.py --token YOUR_API_TOKEN --strategy stratified
-
-# Diverse sampling (jurisdictional diversity)
-python courtlistener_sampler.py --token YOUR_API_TOKEN --strategy diverse
+source venv/bin/activate
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### Advanced Options
+Open http://localhost:8000 in your browser.
+
+### 4. Run CLI Demo (Optional)
 
 ```bash
-# Sample 500 documents instead of 1000
-python courtlistener_sampler.py --token YOUR_API_TOKEN --count 500
-
-# Use 30 years for stratified sampling
-python courtlistener_sampler.py --token YOUR_API_TOKEN --strategy stratified --years 30
-
-# Custom output directory
-python courtlistener_sampler.py --token YOUR_API_TOKEN --output my_corpus
+python agents/legal_agent.py
 ```
 
-### Complete Example
+## Project Structure
 
-```bash
-python courtlistener_sampler.py \
-  --token YOUR_API_TOKEN \
-  --strategy diverse \
-  --count 1000 \
-  --output corpus
+```
+MSA8770_final_project/
+├── app/                    # FastAPI web application
+│   ├── main.py            # App initialization
+│   ├── api.py             # REST API endpoints
+│   ├── templates/         # HTML dashboard
+│   └── static/            # CSS styles
+├── agents/                 # Multi-agent system
+│   ├── legal_tools.py     # Shared tools (RAG, metadata, clustering)
+│   ├── legal_agent.py     # CLI demo
+│   ├── cluster_agent.py   # Topic classification
+│   ├── metadata_agent.py  # Entity extraction
+│   ├── orchestrator.py    # Agent orchestration
+│   └── vector_db.py       # Qdrant interface
+├── data/                   # Processed datasets
+├── corpus/                 # Raw legal opinions
+├── eval/                   # Evaluation methodology
+├── scripts/                # Utility scripts
+└── docs/                   # Additional documentation
 ```
 
-## Sampling Strategies Explained
+## Data Pipeline
 
-### 1. Sequential Sampling
-The simplest approach that collects documents in order as they appear in the API results.
+The system uses ~1,105 legal opinions from [CourtListener.com](https://www.courtlistener.com/):
 
-**Pros:**
-- Fast and straightforward
-- Predictable
-
-**Cons:**
-- May lack diversity
-- Results depend on API's default ordering
-
-**Use when:** You need a quick corpus and diversity isn't critical
-
-### 2. Stratified Sampling
-Divides time into periods (e.g., 20 years) and samples evenly from each period.
-
-**Pros:**
-- Ensures temporal diversity
-- Captures legal evolution over time
-- Good for historical analysis
-
-**Cons:**
-- Slower (more API calls)
-- May have fewer docs in older periods
-
-**Use when:** You need temporal representation across years
-
-### 3. Diverse Sampling
-Samples from different court types to ensure jurisdictional diversity.
-
-**Distribution:**
-- 100 docs from Supreme Court (SCOTUS)
-- 600 docs from Circuit Courts
-- 300 docs from other courts
-
-**Pros:**
-- Jurisdictional diversity
-- Balanced court representation
-- Good for comparative analysis
-
-**Cons:**
-- Fixed distribution ratios
-
-**Use when:** You need representation from different court levels
-
-## Output Format
-
-The tool creates a directory with three files:
-
-### 1. `opinions.jsonl`
-One JSON object per line (useful for streaming/processing):
-```jsonl
-{"id": 123, "court": "scotus", "case_name": "...", "text": "...", ...}
-{"id": 124, "court": "ca9", "case_name": "...", "text": "...", ...}
+```
+Raw opinions → NER extraction → Clustering → Labeled dataset
 ```
 
-### 2. `opinions.json`
-Single JSON array (easier to read):
-```json
-[
-  {
-    "id": 123,
-    "cluster_id": 456,
-    "court": "scotus",
-    "date_filed": "2023-01-15",
-    "case_name": "Smith v. Jones",
-    "text": "Full opinion text...",
-    "url": "/opinion/123/smith-v-jones/"
-  }
-]
-```
+Data files (in `data/`):
+- `summarization_extract_clean.csv` - Base corpus
+- `summarization_with_metadata.csv` - With NER metadata
+- `summarization_with_metadata_clusters_labeled.csv` - Final labeled dataset
 
-### 3. `metadata.json`
-Corpus statistics:
-```json
-{
-  "total_documents": 1000,
-  "date_collected": "2025-11-05T12:00:00",
-  "courts": ["scotus", "ca9", "ca1", ...],
-  "date_range": {
-    "earliest": "2005-01-01",
-    "latest": "2025-11-05"
-  }
-}
-```
+## Documentation
 
-## API Rate Limits
+- [CourtListener Sampler](docs/COURTLISTENER_SAMPLER.md) - Data collection tool
+- [Sampler Quick Start](docs/SAMPLER_QUICKSTART.md) - 5-minute guide
+- [Local Testing Guide](docs/TESTING_LOCALLY.md) - Testing instructions
+- [Agents Documentation](agents/README.md) - Agent implementation details
+- [Evaluation Methodology](eval/EVALUATION_METHODOLOGY.md) - RAG evaluation
 
-- **Authenticated users**: 5,000 requests/hour
-- The tool implements automatic rate limiting (0.8 seconds between requests)
-- Progress is displayed every 100 requests
+## Technologies
 
-**Estimated time for 1000 documents:**
-- If 20 results per page: ~50 API calls × 0.8s = ~40 seconds
-- Actual time varies based on API response time and pagination
-
-## Data Structure
-
-Each opinion document contains:
-
-| Field | Description |
-|-------|-------------|
-| `id` | Unique opinion ID |
-| `cluster_id` | Opinion cluster (group of related opinions) |
-| `court` | Court identifier (e.g., "scotus", "ca9") |
-| `date_filed` | Date the opinion was filed |
-| `case_name` | Name of the case |
-| `text` | Full text of the opinion |
-| `url` | Relative URL on CourtListener |
-
-## Troubleshooting
-
-### "Authentication failed"
-- Verify your API token is correct
-- Check that you're using the format: `--token YOUR_TOKEN` (not with quotes)
-
-### "Rate limit exceeded"
-- Wait an hour for the limit to reset
-- The tool already implements rate limiting, but if you ran other scripts, you may have hit the limit
-
-### "No documents sampled"
-- Check your internet connection
-- Verify the API is accessible: https://www.courtlistener.com/api/rest/v4/
-- Try a different sampling strategy
-
-### "SSL Certificate Error"
-- Update your Python SSL certificates
-- Or add `--no-verify-ssl` flag (not recommended for production)
-
-## CourtListener API Reference
-
-- **API Documentation**: https://www.courtlistener.com/help/api/rest/
-- **Search API**: https://www.courtlistener.com/help/api/rest/search/
-- **Rate Limits**: https://www.courtlistener.com/help/api/
-- **Register Account**: https://www.courtlistener.com/sign-in/register/
-
-## Examples
-
-### Example 1: Quick 100-document test corpus
-```bash
-python courtlistener_sampler.py --token YOUR_TOKEN --count 100 --output test_corpus
-```
-
-### Example 2: Large diverse corpus
-```bash
-python courtlistener_sampler.py --token YOUR_TOKEN --count 5000 --strategy diverse --output large_corpus
-```
-
-### Example 3: Historical analysis corpus (50 years)
-```bash
-python courtlistener_sampler.py --token YOUR_TOKEN --strategy stratified --years 50
-```
+- **Framework**: FastAPI, LangChain, LangGraph
+- **Vector DB**: Qdrant Cloud
+- **LLM**: OpenAI GPT-4o-mini
+- **NLP**: spaCy (en_core_web_sm)
+- **ML**: scikit-learn (KMeans clustering)
 
 ## License
 
-This project is for educational and research purposes. Please comply with CourtListener's Terms of Service when using their API.
-
-## Contributing
-
-Contributions welcome! Feel free to:
-- Add new sampling strategies
-- Improve error handling
-- Add additional output formats
-- Enhance documentation
-
-## Citation
-
-If you use this tool in research, please cite CourtListener:
-
-> Free Law Project. (2025). CourtListener. https://www.courtlistener.com
-
-## Support
-
-For issues with:
-- **This tool**: Open an issue in this repository
-- **CourtListener API**: Contact Free Law Project at https://free.law/contact/
-- **API access**: Check https://www.courtlistener.com/help/api/
+Educational and research use. Legal data sourced from CourtListener (Free Law Project).

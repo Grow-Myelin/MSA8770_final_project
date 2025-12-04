@@ -1,0 +1,779 @@
+{
+  "timestamp": "2025-12-04T14:02:31.779436",
+  "model": "gpt-4o-mini",
+  "num_questions": 23,
+  "categories": [
+    "Legal Standards",
+    "Procedural Requirements",
+    "Common Fact Patterns",
+    "Statutory Provisions"
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "question": "What constitutes \"fault\" for receiving unemployment benefits overpayments under relevant administrative codes?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, \"fault\" in relation to overpayments of benefits typically refers to the circumstances under which an individual received benefits that they were not entitled to. The determination of fault is crucial because it can affect whether the overpayment must be repaid and whether penalties may apply.\n\n### Legal Standards and Tests\n\n1. **Definition of Overpayment**: An overpayment occurs when an individual receives unemployment benefits in excess of what they...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 500,
+          "sources_count": 0,
+          "response_time": 20.663520097732544
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- Under the authorities summarized, a claimant is \u201cat fault\u201d for an unemployment overpayment when the overpayment results from fraud or willful misrepresentation. Where those culpable mental states are absent, statutory limits (e.g., the one\u2011year review bar in Labor Law \u00a7 597(3)) and other protections may apply to limit recovery or bar review.\n\nIntegrated legal insights\n- Statutory baseline: Labor Law \u00a7 597(3) creates a one\u2011year limitation on review of benefit determinations \u201cin th...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 528,
+          "sources_count": 10,
+          "response_time": 40.843904972076416
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "question": "Under what conditions can recoupment of unemployment benefits be waived during the COVID-19 disaster period?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "Recoupment of unemployment benefits refers to the process by which a state agency seeks to recover overpaid unemployment benefits from individuals. During the COVID-19 disaster period, several federal and state provisions were enacted that may affect the recoupment of unemployment benefits. Here are the key conditions under which recoupment can be waived:\n\n### 1. **Federal Legislation and Guidance:**\n   - **CARES Act:** The Coronavirus Aid, Relief, and Economic Security (CARES) Act, enacted in M...",
+        "scores": {
+          "groundedness": 0.0,
+          "answer_quality": 0.8,
+          "word_count": 517,
+          "sources_count": 0,
+          "response_time": 20.580517053604126
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- Recoupment of state unemployment benefits paid during the COVID\u201119 disaster period can be waived or barred when the statutory one\u2011year review limitation in Labor Law \u00a7 597(3) applies \u2014 that is, when the Department does not establish fraud or a willful misrepresentation by the claimant. Where an ALJ finds no willful misrepresentation (for example, because the claimant could not understand English certification forms), the Department\u2019s ability to recover benefits paid during the co...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 1.0,
+          "word_count": 636,
+          "sources_count": 10,
+          "response_time": 60.20696711540222
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "question": "What standard of review applies to agency decisions on mixed questions of fact and law in unemployment appeals?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "In unemployment insurance law, when reviewing agency decisions that involve mixed questions of fact and law, the standard of review typically applied is the \"substantial evidence\" standard. This standard is used by courts to evaluate whether the agency's findings are supported by sufficient evidence in the record, while also considering the legal principles that govern the case.\n\n### Key Concepts:\n\n1. **Mixed Questions of Fact and Law**: These arise when the facts are not in dispute, but the app...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 399,
+          "sources_count": 0,
+          "response_time": 11.876291036605835
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- There is no single fixed standard. Courts review mixed questions of law and fact in unemployment appeals using a hybrid approach: the legal components are reviewed de novo, while the factual components are reviewed deferentially\u2014usually for substantial evidence (and under the APA standard of not being arbitrary, capricious, an abuse of discretion, or contrary to law).\n\nExplanation and how the courts apply it\n- Governing principles\n  - Administrative Procedure Act (5 U.S.C. \u00a7 706)...",
+        "scores": {
+          "groundedness": 1.0,
+          "answer_quality": 0.8,
+          "word_count": 594,
+          "sources_count": 10,
+          "response_time": 47.411325216293335
+        },
+        "sources": [
+          "Fabrizius v. United States Department of Agriculture",
+          "Lacey Thorlton v. Michelle King",
+          "Steve A. Baldwin, as Representative of the Joan A. Baldwin Family Trust, Agreement; The Steve A. Baldwin Family Trust; The Alton Baldwin Family, Trust Agreement; And Baldwin Enterprises v. Arkansas Department Of, Transportation"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "question": "What must claimants certify bi-weekly to maintain eligibility for unemployment benefits?",
+      "category": "Procedural Requirements",
+      "baseline": {
+        "answer": "To maintain eligibility for unemployment benefits, claimants must typically certify several key factors bi-weekly, which can vary slightly by state but generally adhere to common standards established by the U.S. Department of Labor and state unemployment insurance programs. Here are the primary elements that claimants must certify:\n\n1. **Availability for Work**: Claimants must affirm that they are available for work. This means they are ready and willing to accept suitable employment immediatel...",
+        "scores": {
+          "groundedness": 0.0,
+          "answer_quality": 0.8,
+          "word_count": 365,
+          "sources_count": 0,
+          "response_time": 14.946663856506348
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- At minimum, claimants must certify every two weeks that they were totally unemployed and did not earn any income during that certification period.\n\nIntegrated insights and key legal points\n- Required certification: The core representation (per the specialist analysis) is that the claimant was totally unemployed and had no earnings in the covered two\u2011week period.\n- Consequences for false certification: A misrepresentation can render a claimant ineligible for benefits for that peri...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.6000000000000001,
+          "word_count": 283,
+          "sources_count": 10,
+          "response_time": 33.75657892227173
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "question": "When is a claimant considered \"unemployed\" under the Unemployment Insurance Act?",
+      "category": "Procedural Requirements",
+      "baseline": {
+        "answer": "Under the Unemployment Insurance Act (UIA), a claimant is generally considered \"unemployed\" when they meet specific criteria that demonstrate their lack of employment and their availability for work. The definition of \"unemployed\" can vary slightly by jurisdiction, but there are common standards and tests that are typically applied.\n\n### Key Criteria for Being Considered \"Unemployed\":\n\n1. **Lack of Work**: \n   - A claimant must be without work. This means they are not currently engaged in any em...",
+        "scores": {
+          "groundedness": 0.0,
+          "answer_quality": 0.8,
+          "word_count": 502,
+          "sources_count": 0,
+          "response_time": 15.813005685806274
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- Under the Unemployment Insurance Act (as applied in the cited decision), a claimant is \u201cunemployed\u201d only when they are \u201ctotally unemployed\u201d for the period at issue \u2014 i.e., not performing work and not earning income during the week(s) for which benefits are claimed, and otherwise meeting the usual availability/ability-to-work requirements.\n\nSupporting analysis and key principles\n- \u201cTotally unemployed\u201d standard: The controlling fact is whether the claimant was engaged in work or ea...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.6000000000000001,
+          "word_count": 462,
+          "sources_count": 10,
+          "response_time": 36.44177484512329
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "question": "What timeline applies for requesting waiver of overpayment recovery after notice?",
+      "category": "Procedural Requirements",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the timeline for requesting a waiver of overpayment recovery after receiving notice can vary by state, as each state administers its own unemployment insurance program under federal guidelines. However, there are general principles and standards that apply across many jurisdictions.\n\n### General Timeline for Requesting a Waiver\n\n1. **Notice of Overpayment**: When a claimant is determined to have been overpaid unemployment benefits, they typically rec...",
+        "scores": {
+          "groundedness": 0.0,
+          "answer_quality": 0.8,
+          "word_count": 487,
+          "sources_count": 0,
+          "response_time": 17.30503010749817
+        }
+      },
+      "rag": {
+        "answer": "Short answer\n- There is no single universal deadline \u2014 the applicable timeline depends on the statutory/regulatory scheme that governs the specific benefit or program. Key time limits to watch for are:\n  - Administrative appeal/waiver-request deadlines stated in the agency notice and regulations (often 30 days, but vary by program).\n  - A one\u2011year review limitation for unemployment\u2011insurance determinations under Labor Law \u00a7597(3) (absent fraud or willful misrepresentation).\n  - A six\u2011year statut...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 550,
+          "sources_count": 10,
+          "response_time": 47.41094899177551
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "question": "How does failure to report ongoing employment affect unemployment benefit eligibility?",
+      "category": "Common Fact Patterns",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the failure to report ongoing employment can significantly affect an individual's eligibility for unemployment benefits. The specific implications can vary by jurisdiction, but there are common legal standards and principles that generally apply.\n\n### 1. **Eligibility Requirements for Unemployment Benefits**\n\nTo qualify for unemployment benefits, individuals typically must meet certain eligibility criteria, which often include:\n\n- Being unemployed or...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 496,
+          "sources_count": 0,
+          "response_time": 20.152318954467773
+        }
+      },
+      "rag": {
+        "answer": "Short answer\n- Failing to report ongoing employment typically makes you ineligible for unemployment benefits for the period you remain employed. Certifying that you are unemployed while still working can create an overpayment and expose you to penalties if the agency finds the misstatement was willful.\n\nKey legal principles (from the analyses)\n1. Total-unemployment requirement \u2014 most schemes require claimants to be \u201ctotally unemployed\u201d (or meet the scheme\u2019s defined partial\u2011unemployment rules) to...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 482,
+          "sources_count": 10,
+          "response_time": 34.73100423812866
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "question": "What factors determine whether overpayments result from agency error versus claimant misrepresentation?",
+      "category": "Common Fact Patterns",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, determining whether overpayments result from agency error or claimant misrepresentation involves a careful analysis of several factors. The distinction is crucial because it affects the claimant's liability for repayment and the potential for penalties. Here are the key factors and legal standards that are typically considered:\n\n### 1. **Nature of the Overpayment**\n\n- **Agency Error**: This occurs when the unemployment agency makes a mistake in proce...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 654,
+          "sources_count": 0,
+          "response_time": 28.464197158813477
+        }
+      },
+      "rag": {
+        "answer": "Direct answer (summary)\n- Whether an overpayment is the agency\u2019s error or the claimant\u2019s misrepresentation turns on (1) who made the false or incorrect statement (and whether it was knowingly false), (2) the nature of the agency act (ministerial/math versus judgmental/expert), and (3) applicable statutory and procedural limits (e.g., NY Labor Law \u00a7597(3)). Courts look to claimant intent, the documentary record, and whether the error arose from agency calculations or discretionary determinations....",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 591,
+          "sources_count": 10,
+          "response_time": 35.66345405578613
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Garden of Eden Home, LLC v. Bassett"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "question": "In what scenarios does a good faith mistake of fact excuse overpayment liability?",
+      "category": "Common Fact Patterns",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, a good faith mistake of fact can sometimes excuse an individual from liability for overpayment of benefits. The specific standards and doctrines that apply can vary by jurisdiction, but there are common principles that generally govern these situations.\n\n### Key Concepts\n\n1. **Overpayment of Benefits**: An overpayment occurs when an individual receives unemployment benefits that they were not entitled to, often due to incorrect information or a misun...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 576,
+          "sources_count": 0,
+          "response_time": 22.69918394088745
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nA purely good-faith mistake of fact can excuse overpayment liability in limited situations \u2014 typically where the payment was made as an agreed prepayment, where the error was a clear mathematical mistake promptly discovered and corrected, or where equitable defenses (most commonly \u201cchange of position\u201d or estoppel) make restitution unjust. By contrast, courts generally refuse to allow unilateral voluntary overpayments to be credited against future obligations, and public-program over...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 633,
+          "sources_count": 10,
+          "response_time": 46.90105605125427
+        },
+        "sources": [
+          "Robert Wills v. Aniela Humphries, f/k/a Aniela Whah-Wills",
+          "Robert Wills v. Aniela Humphries, f/k/a Aniela Whah-Wills",
+          "Matter of Garden of Eden Home, LLC v. Bassett"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "question": "What are the key statutory requirements for waiver of recoupment of unemployment overpayments?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the recoupment of overpayments refers to the process by which a state unemployment agency seeks to recover benefits that were improperly paid to an individual. Waiver of recoupment is a legal mechanism that allows individuals to avoid repayment of these overpayments under certain circumstances. The key statutory requirements for waiver of recoupment of unemployment overpayments can vary by state, but generally include the following elements:\n\n### 1. ...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 506,
+          "sources_count": 0,
+          "response_time": 17.50810408592224
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\nThe key statutory requirements for waiver (or bar) of recoupment of unemployment overpayments are: (1) a timeliness limitation that prevents recovery after one year unless there was fraud or a willful misrepresentation; (2) a factual determination that there was no fraud or willful misrepresentation (if made, recovery may be barred); and (3) compliance with the administrative review process before judicial relief is available. Federal benefits and recoupment follow a different regu...",
+        "scores": {
+          "groundedness": 1.0,
+          "answer_quality": 0.8,
+          "word_count": 546,
+          "sources_count": 10,
+          "response_time": 34.19360876083374
+        },
+        "sources": [
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "question": "How do administrative rules distinguish between benefits received with fault and those received without fault?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the distinction between benefits received with fault and those received without fault is crucial for determining eligibility for benefits and potential overpayment recovery. This distinction is primarily governed by administrative rules and statutory provisions that vary by state, but there are common principles that apply across many jurisdictions.\n\n### 1. **Definitions of Fault and No Fault**\n\n- **Fault**: Generally, benefits are considered to be r...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 626,
+          "sources_count": 0,
+          "response_time": 15.26285195350647
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nAdministrative rules usually distinguish \u201cwith fault\u201d versus \u201cwithout fault\u201d benefits by looking at whether the recipient caused or knowingly accepted the improper payment (fraud, intentional misrepresentation, or culpable failure to report) versus the recipient receiving benefits through no fault of their own (agency error, employer error, or bona fide reliance). The classification determines (a) the agency\u2019s right to recover, (b) available remedies (repayment, offset, penalties, c...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 653,
+          "sources_count": 10,
+          "response_time": 34.79027819633484
+        },
+        "sources": [
+          "Government of the Virgin Islands v. Elvis George, Mark Lonski, and Property Kings, Inc.",
+          "Ken Lick Coal Company v. OWCP",
+          "Advocate Christ Medical v. Becerra, Sec. of H&HS"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "question": "What role does \"equity and good conscience\" play in deciding whether to waive recoupment?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the concept of \"equity and good conscience\" plays a significant role in determining whether to waive the recoupment of overpaid unemployment benefits. This principle is often invoked when a claimant has received benefits that they were not entitled to, and the unemployment agency seeks to recover those funds.\n\n### Legal Standards and Framework\n\n1. **Recoupment of Overpayments**: Generally, when an individual receives unemployment benefits to which th...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 491,
+          "sources_count": 0,
+          "response_time": 15.89495301246643
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nEquity and \u201cgood conscience\u201d is the controlling, discretionary standard courts use when deciding whether to waive (forgo) recoupment or restitution. Before allowing a party to keep disputed funds, a court must assess whether doing so would be fair under the circumstances \u2014 and if it would be inequitable, the court will deny waiver and order recoupment. In Hamway v. Sutton the court remanded for a hearing precisely to determine whether permitting the plaintiff to retain funds would b...",
+        "scores": {
+          "groundedness": 1.0,
+          "answer_quality": 1.0,
+          "word_count": 591,
+          "sources_count": 10,
+          "response_time": 39.93535494804382
+        },
+        "sources": [
+          "Hamway v. Sutton",
+          "Hamway v. Sutton",
+          "Matter of Garden of Eden Home, LLC v. Bassett"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "question": "What kinds of claimant conduct are treated as making a \"material misrepresentation\" in benefits certifications?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, a \"material misrepresentation\" occurs when a claimant provides false or misleading information that is significant enough to affect the determination of their eligibility for benefits. The legal standards and tests for what constitutes a material misrepresentation can vary by jurisdiction, but there are common principles that apply across many states.\n\n### Types of Conduct Constituting Material Misrepresentation\n\n1. **False Statements Regarding Emplo...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 544,
+          "sources_count": 0,
+          "response_time": 19.60547184944153
+        }
+      },
+      "rag": {
+        "answer": "Direct answer (short):  \nClaimant conduct treated as a \u201cmaterial misrepresentation\u201d in benefits certifications is any affirmative statement or omission in a certification or claim that is about a requirement the payer treats as important and that is likely to (or actually does) affect the payer\u2019s decision to pay. Typical conduct includes expressly false statements, knowingly false certifications of compliance, concealed or omitted disqualifying facts, submission of fabricated supporting document...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.6000000000000001,
+          "word_count": 790,
+          "sources_count": 10,
+          "response_time": 42.71546268463135
+        },
+        "sources": [
+          "Kousisis v. United States",
+          "United States v. Regeneron Pharmaceuticals, Inc.",
+          "Kousisis v. United States"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "question": "How do agencies typically treat situations where claimants rely on incorrect information from government staff?",
+      "category": "Common Fact Patterns",
+      "baseline": {
+        "answer": "In the context of unemployment insurance (UI) law, agencies typically address situations where claimants rely on incorrect information provided by government staff through a combination of legal standards, doctrines, and administrative policies. The treatment of such situations can vary by jurisdiction, but several common principles apply.\n\n### 1. **Equitable Estoppel**\n\nOne of the primary legal doctrines that may come into play is **equitable estoppel**. This doctrine can prevent a government a...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 633,
+          "sources_count": 0,
+          "response_time": 23.688246965408325
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nAgencies will not automatically excuse or compensate claimants who relied on incorrect information from agency staff, but courts treat those situations through familiar administrative-law lenses: agencies must give reasoned explanations when they change rules or reverse prior guidance, must consider and sometimes protect reliance interests, and can be held arbitrary and capricious (or otherwise unlawful) if they mislead regulated parties or ignore serious reliance. Claimants seeking...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 1.0,
+          "word_count": 668,
+          "sources_count": 10,
+          "response_time": 41.57488393783569
+        },
+        "sources": [
+          "FDA v. Wages and White Lion",
+          "CIR v. Zuch",
+          "Williams v. Washington"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "question": "What are common examples of agency error leading to improper benefits payments?",
+      "category": "Common Fact Patterns",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, agency errors can lead to improper benefits payments in various ways. These errors can stem from mistakes made by the unemployment insurance agency during the claims process, which can result in either overpayments or underpayments of benefits. Here are some common examples of agency errors that can lead to improper benefits payments:\n\n1. **Incorrect Application of Eligibility Criteria**: Unemployment agencies must apply specific eligibility criteria...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 687,
+          "sources_count": 0,
+          "response_time": 20.820821046829224
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\nCommon agency errors that lead to improper benefits payments include: (1) incorrect interpretation or application of eligibility rules, (2) failure to verify or monitor actual income/changes in circumstances, (3) poor communication or language-access problems that produce inaccurate certifications, (4) administrative/data-processing or systems-design failures (including prospective payment choices), and (5) failure to distinguish agency error from beneficiary misrepresentation when...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 660,
+          "sources_count": 10,
+          "response_time": 46.49975800514221
+        },
+        "sources": [
+          "Advocate Christ Medical v. Becerra, Sec. of H&HS",
+          "Wisconsin Bell, Inc. v. U.S., ex rel. Heath",
+          "Matter of Mercedes (Commissioner of Labor)"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "question": "How is the concept of \"good faith\" evaluated when claimants misunderstand eligibility questions?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "In the context of unemployment insurance law, the concept of \"good faith\" is often evaluated when claimants misunderstand eligibility questions, particularly in relation to their intent and the circumstances surrounding their application for benefits. The evaluation of good faith can significantly impact the determination of eligibility and the potential for disqualification or penalties.\n\n### Legal Standards and Tests\n\n1. **Intent and Knowledge**: Courts and administrative bodies typically asse...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 515,
+          "sources_count": 0,
+          "response_time": 16.42663812637329
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nGood faith in cases where claimants misunderstand eligibility questions is judged case-by-case by looking at intent, the legal standard for the particular claim, and whether the mistake was willful or fraudulent. Innocent or reasonable misunderstandings ordinarily do not defeat a claim of good faith; deliberate, reckless, or malicious misrepresentations do.\n\nIntegrated legal principles and authorities\n- Distinguish malice/bad faith from honest mistake:\n  - Where an element of the ca...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 1.0,
+          "word_count": 530,
+          "sources_count": 10,
+          "response_time": 43.28153896331787
+        },
+        "sources": [
+          "CONNER v. STATE",
+          "CONNER v. STATE",
+          "A. J. T. v. Osseo Area Schools"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "question": "What evidence is usually relevant to determining a claimant\u2019s state of mind about eligibility?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "In unemployment insurance law, determining a claimant's state of mind regarding eligibility is crucial, particularly when assessing issues such as willful misconduct, voluntary quit, or the claimant's understanding of their eligibility for benefits. The relevant evidence can be categorized into several types:\n\n1. **Claimant's Testimony**: The claimant's own statements during hearings or interviews can provide insight into their understanding of eligibility. This includes their reasons for leavin...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 497,
+          "sources_count": 0,
+          "response_time": 19.750770330429077
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- To determine a claimant\u2019s state of mind about eligibility (e.g., intent, subjective experience of symptoms, belief about ability to work/qualify), decisionmakers rely on a combination of objective medical evidence, contemporaneous documentary evidence, lay testimony, and reasoned medical opinions that link symptoms to work/circumstances. No single item controls; the trier of fact weighs these items under the substantial\u2011evidence/credibility framework.\n\nEvidence types usually rele...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 1.0,
+          "word_count": 663,
+          "sources_count": 10,
+          "response_time": 38.88888716697693
+        },
+        "sources": [
+          "Lacey Thorlton v. Michelle King",
+          "Matter of Tudor v. Whitehall Cent. Sch. Dist.",
+          "State v. Cioffi"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "question": "How do courts describe the purpose and public policy behind unemployment insurance laws?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "Unemployment insurance laws are designed to provide temporary financial assistance to individuals who have lost their jobs through no fault of their own. Courts and legal scholars often articulate the purpose and public policy behind these laws in several key ways:\n\n1. **Economic Stabilization**: One of the primary purposes of unemployment insurance is to stabilize the economy during periods of high unemployment. By providing financial support to unemployed individuals, these laws help maintain ...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 450,
+          "sources_count": 0,
+          "response_time": 11.613294839859009
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\nCourts describe unemployment insurance laws as a remedial social-insurance scheme designed to stabilize workers and the broader economy by providing temporary financial support to people who lose their jobs. The laws are intended to prevent hardship, reduce economic disruption during downturns, and promote the public interest in maintaining an active, employable workforce.\n\nIntegrated insights from the two cases\n- Catholic Charities Bureau v. Wisconsin Labor Review Comm\u2019n\n  - Empha...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 548,
+          "sources_count": 10,
+          "response_time": 39.38441300392151
+        },
+        "sources": [
+          "Catholic Charities Bureau v. WI Labor Review Comm'n",
+          "Catholic Charities Bureau v. WI Labor Review Comm'n",
+          "Williams v. Washington"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "question": "In what ways do courts say unemployment statutes should be construed when deciding eligibility disputes?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "When courts interpret unemployment insurance statutes in the context of eligibility disputes, they generally adhere to several guiding principles and doctrines. These principles help ensure that the statutes are applied fairly and consistently while also considering the underlying purpose of unemployment insurance programs. Here are the key ways in which courts construe unemployment statutes:\n\n1. **Remedial Nature of Unemployment Insurance**: Courts often recognize that unemployment insurance st...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 544,
+          "sources_count": 0,
+          "response_time": 22.005968809127808
+        }
+      },
+      "rag": {
+        "answer": "Short answer\nCourts say unemployment statutes should ordinarily be read according to their plain and ordinary language, but that reading yields to the statute\u2019s purpose or legislative intent (and to avoid absurd results) in rare cases. Courts also require claimants to exhaust the administrative process before judicial review and treat that exhaustion rule as a jurisdictional prerequisite in some jurisdictions. Overall, interpretation should account for the statute\u2019s whole text, context, and the ...",
+        "scores": {
+          "groundedness": 1.0,
+          "answer_quality": 0.8,
+          "word_count": 526,
+          "sources_count": 10,
+          "response_time": 49.0405170917511
+        },
+        "sources": [
+          "Government of the Virgin Islands v. Elvis George, Mark Lonski, and Property Kings, Inc.",
+          "Matter of Mercedes (Commissioner of Labor)",
+          "Williams v. Washington"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "question": "How is the term \"unemployed individual\" defined for purposes of benefits eligibility?",
+      "category": "Statutory Provisions",
+      "baseline": {
+        "answer": "The term \"unemployed individual\" is defined for purposes of unemployment insurance benefits eligibility primarily under the federal Unemployment Insurance (UI) program and various state laws, which can vary in their specific definitions. However, there are common elements that are generally recognized across jurisdictions.\n\n### Federal Definition\n\nUnder the Federal Unemployment Tax Act (FUTA), an \"unemployed individual\" is typically defined as someone who is:\n\n1. **Not engaged in any work**: The...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 476,
+          "sources_count": 0,
+          "response_time": 16.5830020904541
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\n- For benefits eligibility in the contexts considered by the specialist analyses, an \u201cunemployed individual\u201d is generally someone who is not working at all (i.e., \u201ctotally unemployed\u201d) and who does not have an ongoing employment relationship that would disqualify them. Whether a person is \u201cunemployed\u201d is a fact\u2011specific determination that depends on employment status, the nature of any continuing work or enterprise, and applicable statutory/regulatory definitions.\n\nIntegrated key p...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 551,
+          "sources_count": 10,
+          "response_time": 41.503259897232056
+        },
+        "sources": [
+          "Stanley v. City of Sanford",
+          "Black Hills Adventure Lodging, LLC v. Dlr, Reemployment Assistance Division",
+          "Advocate Christ Medical v. Becerra, Sec. of H&HS"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "question": "What is required procedurally for a claimant to appeal an agency\u2019s denial of benefits?",
+      "category": "Procedural Requirements",
+      "baseline": {
+        "answer": "When a claimant wishes to appeal an agency's denial of unemployment benefits, there are specific procedural requirements that must be followed. These requirements can vary by state, but generally, the following steps are common across many jurisdictions:\n\n1. **Notice of Determination**: After an initial claim for unemployment benefits is filed, the unemployment agency will issue a determination regarding eligibility. This notice typically includes the reasons for the denial and information about...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 554,
+          "sources_count": 0,
+          "response_time": 16.22878408432007
+        }
+      },
+      "rag": {
+        "answer": "Direct answer (short): Under the cited statutes and authorities, a claimant appealing an agency\u2019s denial of benefits must (1) timely file a notice of appeal to the appropriate appeals tribunal/Board within the statutory deadline, (2) serve the opposing party, (3) pay the required filing fee or timely file an affidavit of indigency, (4) ensure the administrative record is compiled (transcript or audio) and submitted, and (5) have exhausted required administrative remedies before seeking court rev...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 689,
+          "sources_count": 10,
+          "response_time": 44.94415497779846
+        },
+        "sources": [
+          "Williams v. Washington",
+          "Williams v. Washington",
+          "Ingram. Krystal v. Federal Express Corp."
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "question": "What is required procedurally for a claimant to appeal an agency\u2019s denial of a waiver of recoupment?",
+      "category": "Procedural Requirements",
+      "baseline": {
+        "answer": "When a claimant seeks to appeal an agency's denial of a waiver of recoupment for unemployment insurance benefits, there are specific procedural requirements that must be followed. These requirements can vary by state, but generally include the following steps:\n\n1. **Understanding the Basis for Denial**: The claimant should first carefully review the agency's decision to understand the reasons for the denial of the waiver. This is crucial for formulating an effective appeal.\n\n2. **Filing a Notice...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 1.0,
+          "word_count": 559,
+          "sources_count": 0,
+          "response_time": 16.57041597366333
+        }
+      },
+      "rag": {
+        "answer": "Direct answer \u2014 required procedural steps\n1. Notice. The Department must notify the claimant of the denial (typically by mailing a written notice to the claimant\u2019s last known address). See Ala. Code \u00a7 25\u20114\u201191(c)(1).\n2. Timely request for review. The claimant must seek review by an appeals tribunal within:\n   - 7 days after actual delivery of the notice, or\n   - 15 days after mailing of the notice. See Ala. Code \u00a7 25\u20114\u201191(d).\n3. Appeals tribunal hearing. The appeals tribunal (a Department employe...",
+        "scores": {
+          "groundedness": 0.75,
+          "answer_quality": 0.8,
+          "word_count": 411,
+          "sources_count": 10,
+          "response_time": 42.06269884109497
+        },
+        "sources": [
+          "Williams v. Washington",
+          "State ex rel. Camp v. Ferrellgas Inc.",
+          "Williams v. Washington"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "question": "How do courts describe their role when reviewing administrative decisions on unemployment benefits?",
+      "category": "Legal Standards",
+      "baseline": {
+        "answer": "When courts review administrative decisions regarding unemployment benefits, they typically describe their role as one of limited review, focusing on the principles of administrative law. The standard of review can vary by jurisdiction, but several common legal standards and doctrines are often applied.\n\n1. **Substantial Evidence Standard**: Courts generally assess whether the administrative agency's decision is supported by substantial evidence. This means that the court looks for evidence that...",
+        "scores": {
+          "groundedness": 0.25,
+          "answer_quality": 0.8,
+          "word_count": 427,
+          "sources_count": 0,
+          "response_time": 14.987995862960815
+        }
+      },
+      "rag": {
+        "answer": "Direct answer\nCourts describe their role when reviewing unemployment\u2011benefit decisions as narrowly circumscribed and highly deferential: they do not reweigh evidence or substitute their judgment for the agency\u2019s. Instead, courts ask whether the agency\u2019s or ALJ\u2019s decision is supported by substantial evidence, comports with applicable law (is not arbitrary, capricious, or beyond statutory authority), and includes an adequate factual basis. Procedural prerequisites (like administrative exhaustion) ...",
+        "scores": {
+          "groundedness": 1.0,
+          "answer_quality": 0.8,
+          "word_count": 534,
+          "sources_count": 10,
+          "response_time": 43.70505118370056
+        },
+        "sources": [
+          "Williams v. Washington",
+          "Williams v. Washington",
+          "Williams v. Washington"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "rag": {
+      "groundedness": 0.8043478260869565,
+      "answer_quality": 0.8173913043478263,
+      "word_count": 570.3913043478261,
+      "response_time": 41.99508182898812
+    },
+    "baseline": {
+      "groundedness": 0.20652173913043478,
+      "answer_quality": 0.8086956521739133,
+      "word_count": 521.9565217391304,
+      "response_time": 18.236871605334073
+    }
+  },
+  "by_category": {
+    "Legal Standards": {
+      "rag": {
+        "groundedness": 0.8214285714285714,
+        "answer_quality": 0.8571428571428571,
+        "word_count": 610.7142857142857,
+        "response_time": 45.293305328914094
+      },
+      "baseline": {
+        "groundedness": 0.21428571428571427,
+        "answer_quality": 0.7999999999999999,
+        "word_count": 485.57142857142856,
+        "response_time": 17.69874347959246
+      },
+      "count": 7
+    },
+    "Procedural Requirements": {
+      "rag": {
+        "groundedness": 0.75,
+        "answer_quality": 0.72,
+        "word_count": 479.0,
+        "response_time": 40.923231315612796
+      },
+      "baseline": {
+        "groundedness": 0.1,
+        "answer_quality": 0.8400000000000001,
+        "word_count": 493.4,
+        "response_time": 16.172779941558836
+      },
+      "count": 5
+    },
+    "Common Fact Patterns": {
+      "rag": {
+        "groundedness": 0.75,
+        "answer_quality": 0.8400000000000001,
+        "word_count": 606.8,
+        "response_time": 41.07403125762939
+      },
+      "baseline": {
+        "groundedness": 0.25,
+        "answer_quality": 0.8,
+        "word_count": 609.2,
+        "response_time": 23.16495361328125
+      },
+      "count": 5
+    },
+    "Statutory Provisions": {
+      "rag": {
+        "groundedness": 0.875,
+        "answer_quality": 0.8333333333333334,
+        "word_count": 569.1666666666666,
+        "response_time": 39.807905316352844
+      },
+      "baseline": {
+        "groundedness": 0.25,
+        "answer_quality": 0.7999999999999999,
+        "word_count": 515.5,
+        "response_time": 16.478029131889343
+      },
+      "count": 6
+    }
+  }
+}

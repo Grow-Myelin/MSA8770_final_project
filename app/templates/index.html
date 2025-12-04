@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSA8770 Legal Demo - Multi-Agent Case Analysis</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-title">
+                <h1>Legal Case Analysis Dashboard</h1>
+                <p class="subtitle">Multi-Agent RAG System for U.S. Appellate Opinions</p>
+            </div>
+            <div class="header-profile">
+                <label for="profile-select">Profile:</label>
+                <select id="profile-select">
+                    <option value="">No Profile (Guest)</option>
+                </select>
+                <button type="button" id="new-profile-btn" class="header-btn" title="Create new profile">+</button>
+                <button type="button" id="view-profile-btn" class="header-btn" title="View profile details" disabled>i</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Panel: Controls -->
+        <aside class="sidebar">
+            <section class="control-section">
+                <h2>Ask a Legal Question</h2>
+                <form id="ask-form">
+                    <textarea id="question-input" placeholder="Enter your legal question..." rows="3"></textarea>
+                    <div class="form-row">
+                        <label for="mode-select">Analysis Mode:</label>
+                        <select id="mode-select">
+                            <option value="overview">Overview</option>
+                            <option value="outcome">Outcome</option>
+                            <option value="rules" selected>Rules</option>
+                            <option value="reasoning">Reasoning</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agent-mode-toggle" checked>
+                            <span>Agent Mode (show reasoning)</span>
+                        </label>
+                    </div>
+                    <div class="form-row button-row">
+                        <button type="submit" id="ask-btn">Ask Question</button>
+                        <button type="button" id="new-conversation-btn" class="secondary-btn" title="Start a new conversation thread">New Thread</button>
+                    </div>
+                    <div class="conversation-indicator" id="conversation-indicator">
+                        <span class="indicator-dot"></span>
+                        <span id="conversation-count">New conversation</span>
+                    </div>
+                </form>
+            </section>
+
+            <section class="control-section">
+                <h2>Browse Cases</h2>
+                <input type="text" id="case-search" placeholder="Search cases..." class="search-input">
+                <select id="case-select">
+                    <option value="">Select a case...</option>
+                </select>
+                <div class="case-count" id="case-count"></div>
+            </section>
+
+            <section class="control-section">
+                <h2>Browse Topics</h2>
+                <div id="cluster-list" class="cluster-list">
+                    <p class="loading">Loading clusters...</p>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Main Content: Results -->
+        <div class="content">
+            <!-- Agent Activity Panel -->
+            <section class="panel agent-panel" id="agent-panel">
+                <h2>Agent Activity <span class="agent-status" id="agent-status"></span></h2>
+                <div class="panel-content" id="agent-activity">
+                    <p class="placeholder">Agent activity will appear here when you ask a question in Agent Mode.</p>
+                </div>
+            </section>
+
+            <!-- RAG Answer Panel -->
+            <section class="panel" id="rag-panel">
+                <h2>Final Answer</h2>
+                <div class="panel-content" id="rag-content">
+                    <p class="placeholder">Ask a question to see the AI-generated answer based on the legal corpus.</p>
+                </div>
+            </section>
+
+            <!-- Case Details / Cluster Panel -->
+            <section class="panel" id="cluster-panel">
+                <h2>Topic / Cluster Info</h2>
+                <div class="panel-content" id="cluster-content">
+                    <p class="placeholder">Select a case or cluster to see topic information.</p>
+                </div>
+            </section>
+
+            <!-- Metadata Panel -->
+            <section class="panel" id="metadata-panel">
+                <h2>Extracted Metadata</h2>
+                <div class="panel-content" id="metadata-content">
+                    <p class="placeholder">Select a case to see extracted entities and classifications.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Side Panel for Full Case Text -->
+    <div id="case-side-panel" class="side-panel">
+        <div class="side-panel-header">
+            <h3 id="side-panel-title">Case Details</h3>
+            <button type="button" class="side-panel-close" onclick="closeCasePanel()">&times;</button>
+        </div>
+        <div class="side-panel-content" id="side-panel-content">
+            <p class="loading">Loading case...</p>
+        </div>
+    </div>
+    <div id="side-panel-overlay" class="side-panel-overlay" onclick="closeCasePanel()"></div>
+
+    <footer>
+        <p>MSA8770 Final Project - Multi-Agent Legal Analysis System</p>
+    </footer>
+
+    <!-- Profile Detail Modal -->
+    <div id="profile-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Profile Details</h3>
+                <button type="button" class="modal-close" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="profile-modal-body">
+                <!-- Profile details loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeProfileModal()">Close</button>
+                <button type="button" class="danger-btn" id="delete-profile-btn" onclick="deleteCurrentProfile()">Delete Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // Conversation Memory
+        // ============================================
+
+        // Generate unique conversation ID
+        function generateConversationId() {
+            return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Current conversation state
+        let currentConversationId = generateConversationId();
+        let conversationMessageCount = 0;
+
+        function updateConversationIndicator() {
+            const countSpan = document.getElementById('conversation-count');
+            if (conversationMessageCount === 0) {
+                countSpan.textContent = 'New conversation';
+            } else {
+                countSpan.textContent = `${conversationMessageCount} message${conversationMessageCount !== 1 ? 's' : ''} in thread`;
+            }
+        }
+
+        function startNewConversation() {
+            currentConversationId = generateConversationId();
+            conversationMessageCount = 0;
+            updateConversationIndicator();
+
+            // Clear the UI
+            document.getElementById('agent-activity').innerHTML =
+                '<p class="placeholder">Agent activity will appear here when you ask a question in Agent Mode.</p>';
+            document.getElementById('rag-content').innerHTML =
+                '<p class="placeholder">Ask a question to see the AI-generated answer based on the legal corpus.</p>';
+            document.getElementById('agent-status').textContent = '';
+            document.getElementById('agent-status').className = 'agent-status';
+        }
+
+        // ============================================
+        // User Profile Management (Long-Term Memory)
+        // ============================================
+
+        let currentProfileId = null;
+        let currentProfileData = null;
+
+        async function loadProfiles() {
+            try {
+                const response = await fetch('/api/profiles');
+                if (!response.ok) throw new Error('Failed to load profiles');
+                const data = await response.json();
+                return data.profiles || [];
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+                return [];
+            }
+        }
+
+        async function createProfile(name) {
+            try {
+                const response = await fetch('/api/profiles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (!response.ok) throw new Error('Failed to create profile');
+                return await response.json();
+            } catch (error) {
+                console.error('Error creating profile:', error);
+                return null;
+            }
+        }
+
+        async function getProfileDetail(profileId) {
+            try {
+                const response = await fetch(`/api/profiles/${profileId}`);
+                if (!response.ok) throw new Error('Failed to load profile');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                return null;
+            }
+        }
+
+        async function deleteProfile(profileId) {
+            try {
+                const response = await fetch(`/api/profiles/${profileId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete profile');
+                return true;
+            } catch (error) {
+                console.error('Error deleting profile:', error);
+                return false;
+            }
+        }
+
+        async function refreshProfileSelect() {
+            const select = document.getElementById('profile-select');
+            const profiles = await loadProfiles();
+
+            // Preserve current selection
+            const currentValue = select.value;
+
+            select.innerHTML = '<option value="">No Profile (Guest)</option>';
+            for (const profile of profiles) {
+                const option = document.createElement('option');
+                option.value = profile.profile_id;
+                option.textContent = `${profile.name} (${profile.query_count} queries)`;
+                select.appendChild(option);
+            }
+
+            // Restore selection if still valid
+            if (currentValue && profiles.some(p => p.profile_id === currentValue)) {
+                select.value = currentValue;
+            }
+
+            // Update view button state
+            document.getElementById('view-profile-btn').disabled = !select.value;
+        }
+
+        function handleProfileChange(profileId) {
+            currentProfileId = profileId || null;
+
+            // Update view button state
+            document.getElementById('view-profile-btn').disabled = !profileId;
+
+            if (profileId) {
+                console.log('Profile activated:', profileId);
+            } else {
+                console.log('Guest mode (no profile)');
+                currentProfileData = null;
+            }
+        }
+
+        async function handleNewProfile() {
+            const name = prompt('Enter a name for your new profile:');
+            if (!name || !name.trim()) return;
+
+            const profile = await createProfile(name.trim());
+            if (profile) {
+                await refreshProfileSelect();
+                document.getElementById('profile-select').value = profile.profile_id;
+                handleProfileChange(profile.profile_id);
+            }
+        }
+
+        async function showProfileModal() {
+            if (!currentProfileId) return;
+
+            const profile = await getProfileDetail(currentProfileId);
+            if (!profile) {
+                alert('Could not load profile details');
+                return;
+            }
+
+            currentProfileData = profile;
+            document.getElementById('modal-title').textContent = profile.name;
+
+            let html = `
+                <div class="profile-detail">
+                    <div class="profile-stat">
+                        <span class="stat-label">Profile ID:</span>
+                        <span class="stat-value">${escapeHtml(profile.profile_id)}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="stat-label">Created:</span>
+                        <span class="stat-value">${new Date(profile.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="stat-label">Last Updated:</span>
+                        <span class="stat-value">${new Date(profile.updated_at).toLocaleDateString()}</span>
+                    </div>
+
+                    <h4>Detected Preferences</h4>
+                    <div class="profile-preferences">
+                        <div class="preference-item">
+                            <strong>Areas of Law:</strong>
+                            ${profile.preferences?.areas_of_law?.length > 0
+                                ? profile.preferences.areas_of_law.map(a => `<span class="tag">${escapeHtml(a)}</span>`).join('')
+                                : '<span class="empty">None detected yet</span>'}
+                        </div>
+                        <div class="preference-item">
+                            <strong>Jurisdictions:</strong>
+                            ${profile.preferences?.jurisdictions?.length > 0
+                                ? profile.preferences.jurisdictions.map(j => `<span class="tag">${escapeHtml(j)}</span>`).join('')
+                                : '<span class="empty">None detected yet</span>'}
+                        </div>
+                    </div>
+
+                    ${profile.topics_summary ? `
+                        <h4>Topics Summary</h4>
+                        <p class="topics-summary">${escapeHtml(profile.topics_summary)}</p>
+                    ` : ''}
+
+                    <h4>Recent Query History (${profile.query_history?.length || 0})</h4>
+                    <div class="query-history">
+                        ${profile.query_history?.length > 0 ? `
+                            <ul>
+                                ${profile.query_history.slice(-5).reverse().map(q => `
+                                    <li class="${q.session_log_file ? 'clickable-query' : ''}" ${q.session_log_file ? `onclick="replaySession('${escapeHtml(q.session_log_file)}')"` : ''}>
+                                        <div class="query-question">
+                                            ${q.session_log_file ? '<span class="replay-icon" title="Click to replay session">&#x21bb;</span>' : ''}
+                                            ${escapeHtml(q.question?.substring(0, 100) || '')}${q.question?.length > 100 ? '...' : ''}
+                                        </div>
+                                        <div class="query-meta">
+                                            ${q.area_of_law ? `<span class="tag small">${escapeHtml(q.area_of_law)}</span>` : ''}
+                                            <span class="query-time">${new Date(q.timestamp).toLocaleDateString()}</span>
+                                            ${q.session_log_file ? '<span class="session-available">Session available</span>' : ''}
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        ` : '<p class="empty">No queries recorded yet</p>'}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('profile-modal-body').innerHTML = html;
+            document.getElementById('profile-modal').style.display = 'flex';
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').style.display = 'none';
+        }
+
+        async function deleteCurrentProfile() {
+            if (!currentProfileId) return;
+
+            const confirmed = confirm(`Are you sure you want to delete the profile "${currentProfileData?.name || currentProfileId}"? This cannot be undone.`);
+            if (!confirmed) return;
+
+            const success = await deleteProfile(currentProfileId);
+            if (success) {
+                closeProfileModal();
+                currentProfileId = null;
+                currentProfileData = null;
+                document.getElementById('profile-select').value = '';
+                await refreshProfileSelect();
+            } else {
+                alert('Failed to delete profile');
+            }
+        }
+
+        // ============================================
+        // API Functions
+        // ============================================
+
+        async function fetchCases(search = '') {
+            try {
+                let url = '/api/cases?limit=500';
+                if (search) {
+                    url += `&search=${encodeURIComponent(search)}`;
+                }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load cases');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching cases:', error);
+                return [];
+            }
+        }
+
+        async function fetchClusters() {
+            try {
+                const response = await fetch('/api/clusters');
+                if (!response.ok) throw new Error('Failed to load clusters');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching clusters:', error);
+                return [];
+            }
+        }
+
+        async function fetchCaseDetail(caseId) {
+            try {
+                const response = await fetch(`/api/cases/${encodeURIComponent(caseId)}`);
+                if (!response.ok) throw new Error('Failed to load case');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching case:', error);
+                return null;
+            }
+        }
+
+        async function fetchClusterDetail(clusterId) {
+            try {
+                const response = await fetch(`/api/clusters/${clusterId}`);
+                if (!response.ok) throw new Error('Failed to load cluster');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching cluster:', error);
+                return null;
+            }
+        }
+
+        async function fetchCaseFullText(caseId) {
+            try {
+                const response = await fetch(`/api/cases/${encodeURIComponent(caseId)}/full`);
+                if (!response.ok) throw new Error('Failed to load case full text');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching case full text:', error);
+                return null;
+            }
+        }
+
+        async function fetchSessionLog(filename) {
+            try {
+                const response = await fetch(`/api/logs/sessions/${encodeURIComponent(filename)}`);
+                if (!response.ok) throw new Error('Failed to load session log');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching session log:', error);
+                return null;
+            }
+        }
+
+        // ============================================
+        // Side Panel Functions
+        // ============================================
+
+        async function openCasePanel(caseId) {
+            const panel = document.getElementById('case-side-panel');
+            const overlay = document.getElementById('side-panel-overlay');
+            const content = document.getElementById('side-panel-content');
+            const title = document.getElementById('side-panel-title');
+
+            // Show panel with loading state
+            content.innerHTML = '<p class="loading">Loading full case text...</p>';
+            title.textContent = 'Loading...';
+            panel.classList.add('open');
+            overlay.classList.add('visible');
+
+            // Fetch full case text
+            const caseData = await fetchCaseFullText(caseId);
+
+            if (caseData) {
+                title.textContent = caseData.case_name || 'Case Details';
+
+                let html = `
+                    <div class="case-full-details">
+                        <div class="case-meta">
+                            <div class="meta-item"><strong>Case ID:</strong> ${escapeHtml(caseData.id)}</div>
+                            ${caseData.area_of_law ? `<div class="meta-item"><strong>Area of Law:</strong> <span class="tag">${escapeHtml(caseData.area_of_law)}</span></div>` : ''}
+                            ${caseData.cluster_label ? `<div class="meta-item"><strong>Topic:</strong> ${escapeHtml(caseData.cluster_label)}</div>` : ''}
+                            ${caseData.cluster_description ? `<div class="meta-item"><strong>Cluster:</strong> ${escapeHtml(caseData.cluster_description)}</div>` : ''}
+                            ${caseData.remedy_type?.length > 0 ? `<div class="meta-item"><strong>Remedies:</strong> ${caseData.remedy_type.map(r => `<span class="tag small">${escapeHtml(r)}</span>`).join(' ')}</div>` : ''}
+                            <div class="meta-item"><strong>Text Length:</strong> ${caseData.text_length?.toLocaleString() || 'N/A'} characters</div>
+                        </div>
+                        <div class="case-full-text">
+                            <h4>Full Case Text</h4>
+                            <div class="full-text-content">${escapeHtml(caseData.text_full || 'No text available')}</div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML = html;
+            } else {
+                content.innerHTML = '<p class="error">Failed to load case details.</p>';
+            }
+        }
+
+        function closeCasePanel() {
+            const panel = document.getElementById('case-side-panel');
+            const overlay = document.getElementById('side-panel-overlay');
+            panel.classList.remove('open');
+            overlay.classList.remove('visible');
+        }
+
+        // ============================================
+        // Session Replay Functions
+        // ============================================
+
+        async function replaySession(filename) {
+            const sessionData = await fetchSessionLog(filename);
+            if (!sessionData) {
+                alert('Could not load session log');
+                return;
+            }
+
+            // Close the profile modal
+            closeProfileModal();
+
+            // Clear current display
+            const activityDiv = document.getElementById('agent-activity');
+            const ragContent = document.getElementById('rag-content');
+            const statusSpan = document.getElementById('agent-status');
+
+            activityDiv.innerHTML = '';
+            statusSpan.textContent = '(replaying session)';
+            statusSpan.className = 'agent-status';
+
+            // Display session info
+            let finalResult = null;
+
+            // Replay each event
+            for (const event of sessionData.events || []) {
+                const eventEl = createAgentEventElement(event);
+                activityDiv.appendChild(eventEl);
+
+                // Capture final answer
+                if (event.event === 'agent_complete' && event.agent === 'supervisor') {
+                    if (event.data) {
+                        finalResult = {
+                            answer: event.data.final_answer,
+                            sources: event.data.grounded_sources || [],
+                            metadata: event.data.grounded_metadata || {}
+                        };
+                    }
+                }
+            }
+
+            // Update status
+            statusSpan.textContent = '(session replay)';
+            statusSpan.className = 'agent-status complete';
+
+            // Display the final answer
+            if (finalResult && finalResult.answer) {
+                let html = `
+                    <div class="answer-section">
+                        <div class="replay-indicator">Session Replay - ${escapeHtml(sessionData.metadata?.question?.substring(0, 100) || 'Unknown')}</div>
+                        <h3>Answer:</h3>
+                        <div class="answer-text">${escapeHtml(finalResult.answer)}</div>
+                    </div>
+                `;
+
+                if (finalResult.sources && finalResult.sources.length > 0) {
+                    html += `
+                        <div class="grounded-sources-section">
+                            <h3><span class="source-type-badge grounded">GROUNDED SOURCES</span></h3>
+                            <div class="source-list">
+                    `;
+                    for (const src of finalResult.sources) {
+                        html += `
+                            <div class="source-item">
+                                <div class="source-name clickable-case" onclick="openCasePanel('${escapeHtml(src.case_id)}')">${src.rank ? '#' + src.rank + ' ' : ''}${escapeHtml(src.case_name || 'Unknown Case')}</div>
+                                <div class="source-snippet">${escapeHtml(src.snippet?.substring(0, 300) || '')}...</div>
+                            </div>
+                        `;
+                    }
+                    html += `</div></div>`;
+                }
+                ragContent.innerHTML = html;
+            } else {
+                ragContent.innerHTML = `<div class="replay-indicator">Session replay complete - see agent activity for details</div>`;
+            }
+
+            // Scroll to top of agent activity
+            activityDiv.scrollTop = 0;
+        }
+
+        async function askQuestion(question, mode, k = 5) {
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, mode, k })
+                });
+                if (!response.ok) throw new Error('Failed to get answer');
+                return await response.json();
+            } catch (error) {
+                console.error('Error asking question:', error);
+                return null;
+            }
+        }
+
+        // ============================================
+        // UI Update Functions
+        // ============================================
+
+        function updateRAGPanel(data) {
+            const content = document.getElementById('rag-content');
+            if (!data) {
+                content.innerHTML = '<p class="error">Failed to get answer. Please try again.</p>';
+                return;
+            }
+
+            let html = `
+                <div class="answer-section">
+                    <h3>Question (${data.mode} mode):</h3>
+                    <p class="question-text">${escapeHtml(data.question)}</p>
+                    <h3>Answer:</h3>
+                    <div class="answer-text">${escapeHtml(data.answer)}</div>
+                </div>
+            `;
+
+            if (data.sources && data.sources.length > 0) {
+                html += '<div class="sources-section"><h3>Sources:</h3><ul class="sources-list">';
+                for (const source of data.sources) {
+                    html += `
+                        <li class="source-item">
+                            <strong>${escapeHtml(source.case_name || source.case_id)}</strong>
+                            <p class="source-snippet">${escapeHtml(source.snippet)}...</p>
+                        </li>
+                    `;
+                }
+                html += '</ul></div>';
+            }
+
+            content.innerHTML = html;
+        }
+
+        function updateClusterPanel(data, isCase = false) {
+            const content = document.getElementById('cluster-content');
+            if (!data) {
+                content.innerHTML = '<p class="error">Failed to load data.</p>';
+                return;
+            }
+
+            let html = '';
+
+            if (isCase) {
+                // Display case cluster info
+                html = `
+                    <div class="cluster-info">
+                        <h3>Case: ${escapeHtml(data.case_name)}</h3>
+                        ${data.cluster_id !== null ? `
+                            <p><strong>Cluster ID:</strong> ${data.cluster_id}</p>
+                            <p><strong>Topic:</strong> ${escapeHtml(data.cluster_label || 'N/A')}</p>
+                            <p><strong>Description:</strong> ${escapeHtml(data.cluster_description || 'N/A')}</p>
+                        ` : '<p>No cluster assignment available.</p>'}
+                    </div>
+                `;
+            } else {
+                // Display cluster detail
+                html = `
+                    <div class="cluster-info">
+                        <h3>${escapeHtml(data.label)}</h3>
+                        <p><strong>Cluster ID:</strong> ${data.cluster_id}</p>
+                        <p><strong>Description:</strong> ${escapeHtml(data.description)}</p>
+                        ${data.sample_case ? `<p><strong>Sample Case:</strong> ${escapeHtml(data.sample_case)}</p>` : ''}
+                    </div>
+                `;
+
+                if (data.cases && data.cases.length > 0) {
+                    html += '<div class="cases-in-cluster"><h4>Cases in this cluster:</h4><ul>';
+                    for (const c of data.cases.slice(0, 10)) {
+                        html += `<li><a href="#" onclick="loadCase('${escapeHtml(c.id)}'); return false;">${escapeHtml(c.case_name)}</a></li>`;
+                    }
+                    if (data.cases.length > 10) {
+                        html += `<li><em>...and ${data.cases.length - 10} more</em></li>`;
+                    }
+                    html += '</ul></div>';
+                }
+            }
+
+            content.innerHTML = html;
+        }
+
+        function updateMetadataPanel(data) {
+            const content = document.getElementById('metadata-content');
+            if (!data) {
+                content.innerHTML = '<p class="error">Failed to load metadata.</p>';
+                return;
+            }
+
+            let html = `
+                <div class="metadata-info">
+                    <h3>${escapeHtml(data.case_name)}</h3>
+                    <p><strong>Area of Law:</strong> ${escapeHtml(data.area_of_law || 'Not classified')}</p>
+
+                    <div class="metadata-section">
+                        <strong>Remedy Types:</strong>
+                        ${data.remedy_type && data.remedy_type.length > 0
+                            ? `<ul>${data.remedy_type.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`
+                            : '<p>None identified</p>'}
+                    </div>
+
+                    <div class="metadata-section">
+                        <strong>Organizations:</strong>
+                        ${data.organizations && data.organizations.length > 0
+                            ? `<ul>${data.organizations.slice(0, 10).map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
+                            : '<p>None identified</p>'}
+                    </div>
+
+                    <div class="metadata-section">
+                        <strong>Places:</strong>
+                        ${data.places && data.places.length > 0
+                            ? `<ul>${data.places.slice(0, 10).map(p => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
+                            : '<p>None identified</p>'}
+                    </div>
+
+                    <div class="metadata-section">
+                        <strong>Text Preview:</strong>
+                        <p class="text-preview">${escapeHtml(data.text_preview || '').substring(0, 500)}...</p>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        function updateClusterList(clusters) {
+            const container = document.getElementById('cluster-list');
+            if (!clusters || clusters.length === 0) {
+                container.innerHTML = '<p class="placeholder">No clusters available.</p>';
+                return;
+            }
+
+            let html = '<ul>';
+            for (const cluster of clusters) {
+                html += `
+                    <li class="cluster-item" onclick="loadCluster(${cluster.cluster_id})">
+                        <span class="cluster-label">${escapeHtml(cluster.label)}</span>
+                        <span class="cluster-count">${cluster.case_count} cases</span>
+                    </li>
+                `;
+            }
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        function populateCaseSelect(cases) {
+            const select = document.getElementById('case-select');
+            const countDiv = document.getElementById('case-count');
+
+            select.innerHTML = '<option value="">Select a case...</option>';
+            for (const c of cases) {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.case_name || c.id;
+                select.appendChild(option);
+            }
+
+            countDiv.textContent = `${cases.length} cases`;
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Search handler
+        const handleCaseSearch = debounce(async (searchTerm) => {
+            const cases = await fetchCases(searchTerm);
+            populateCaseSelect(cases);
+        }, 300);
+
+        // ============================================
+        // Agent Streaming Functions
+        // ============================================
+
+        function getAgentIcon(agent) {
+            const icons = {
+                'supervisor': '🎯',
+                'rag_specialist': '📚',
+                'metadata_specialist': '🏷️',
+                'cluster_specialist': '🔗',
+                'system': '⚙️'
+            };
+            return icons[agent] || '•';
+        }
+
+        function getAgentDisplayName(agent) {
+            const names = {
+                'supervisor': 'Supervisor',
+                'rag_specialist': 'RAG Specialist',
+                'metadata_specialist': 'Metadata Specialist',
+                'cluster_specialist': 'Cluster Specialist',
+                'system': 'System'
+            };
+            return names[agent] || agent;
+        }
+
+        function createAgentEventElement(event) {
+            const div = document.createElement('div');
+            div.className = `agent-event ${event.agent} ${event.event}`;
+
+            // Check if this event has expandable content
+            const hasExpandableContent = event.event === 'llm_prompt' ||
+                (event.event === 'tool_call' && event.data) ||
+                (event.event === 'llm_generated' && event.data?.answer_preview) ||
+                (event.event === 'retrieved_sources' && event.data?.sources?.length > 0);
+
+            if (hasExpandableContent) {
+                div.classList.add('expandable');
+                div.dataset.expanded = 'false';
+            }
+
+            const icon = getAgentIcon(event.agent);
+            const agentName = getAgentDisplayName(event.agent);
+
+            let content = `<span class="event-icon">${icon}</span>`;
+            content += `<span class="event-agent">${agentName}</span>`;
+            content += `<span class="event-type">[${event.event}]</span>`;
+            content += `<span class="event-message">${escapeHtml(event.message)}</span>`;
+
+            // Add expand indicator for expandable events
+            if (hasExpandableContent) {
+                content += `<span class="expand-indicator">+ Click to expand</span>`;
+            }
+
+            // Add timestamp
+            if (event.timestamp) {
+                const time = new Date(event.timestamp).toLocaleTimeString();
+                content += `<span class="event-time">${time}</span>`;
+            }
+
+            // Handle GROUNDED vs GENERATED data display
+            if (event.data && Object.keys(event.data).length > 0) {
+                // LLM Prompt events - show full prompt details when expanded
+                if (event.event === 'llm_prompt') {
+                    content += `<div class="event-data-summary">`;
+                    content += `<span class="source-type-badge prompt">LLM PROMPT</span>`;
+                    content += `<span style="margin-left: 0.5rem; font-size: 0.75rem; color: #718096;">${event.data.messages?.length || 0} messages, ${event.data.total_length?.toLocaleString() || 0} chars</span>`;
+                    content += `</div>`;
+
+                    // Full content (hidden by default)
+                    content += `<div class="event-data-full">`;
+                    if (event.data.messages) {
+                        for (const msg of event.data.messages) {
+                            const roleClass = msg.role === 'system' ? 'system-message' : 'human-message';
+                            content += `<div class="prompt-message ${roleClass}">`;
+                            content += `<div class="prompt-role">${escapeHtml(msg.role.toUpperCase())}</div>`;
+                            content += `<div class="prompt-content">${escapeHtml(msg.content)}</div>`;
+                            content += `</div>`;
+                        }
+                    }
+                    content += `</div>`;
+                }
+                // Retrieved sources from corpus (GROUNDED)
+                else if (event.event === 'retrieved_sources' && event.data.sources) {
+                    // Summary view (always visible)
+                    content += `<div class="event-data-summary">`;
+                    content += `<span class="source-type-badge grounded">${escapeHtml(event.data.source_type || 'GROUNDED')}</span>`;
+                    content += `<span style="margin-left: 0.5rem; font-size: 0.75rem; color: #718096;">${event.data.sources.length} sources retrieved</span>`;
+                    content += `<div class="source-list-preview">`;
+                    for (const src of event.data.sources.slice(0, 3)) {
+                        const safeIdPreview = (src.case_id || '').replace(/'/g, "\\'");
+                        content += `<div class="source-item-preview">`;
+                        content += `<span class="source-name clickable-case" onclick="event.stopPropagation(); openCasePanel('${safeIdPreview}')">#${src.rank} ${escapeHtml(src.case_name)}</span>`;
+                        content += `</div>`;
+                    }
+                    if (event.data.sources.length > 3) {
+                        content += `<div class="source-more">+${event.data.sources.length - 3} more...</div>`;
+                    }
+                    content += `</div></div>`;
+
+                    // Full content (hidden by default, shown when expanded)
+                    content += `<div class="event-data-full">`;
+                    content += `<div class="source-list">`;
+                    for (const src of event.data.sources) {
+                        const safeId = (src.case_id || '').replace(/'/g, "\\'");
+                        content += `<div class="source-item">`;
+                        content += `<div class="source-name clickable-case" onclick="event.stopPropagation(); openCasePanel('${safeId}')">#${src.rank} ${escapeHtml(src.case_name)}</div>`;
+                        content += `<div class="source-meta">`;
+                        content += `<span class="source-id">${escapeHtml(src.case_id || '')}</span>`;
+                        if (src.chunk_type) {
+                            content += `<span class="source-chunk-type">${escapeHtml(src.chunk_type)}</span>`;
+                        }
+                        if (src.text_length) {
+                            content += `<span class="source-length">${src.text_length.toLocaleString()} chars</span>`;
+                        }
+                        if (src.score) {
+                            content += `<span class="source-score">Score: ${src.score.toFixed(4)}</span>`;
+                        }
+                        content += `</div>`;
+                        content += `<div class="source-snippet-full">${escapeHtml(src.snippet || 'No snippet available')}</div>`;
+                        content += `</div>`;
+                    }
+                    content += `</div></div>`;
+                }
+                // LLM Generated content
+                else if (event.event === 'llm_generated') {
+                    content += `<div class="event-data-summary">`;
+                    content += `<span class="source-type-badge generated">${escapeHtml(event.data.source_type || 'LLM GENERATED')}</span>`;
+                    content += `</div>`;
+
+                    // Full content (hidden by default)
+                    content += `<div class="event-data-full">`;
+                    if (event.data.answer_preview) {
+                        content += `<div class="llm-output">${escapeHtml(event.data.answer_preview)}</div>`;
+                    }
+                    content += `</div>`;
+                }
+                // Extracted entities (GROUNDED via NER)
+                else if (event.event === 'extracted_entities') {
+                    content += `<div class="event-data">`;
+                    content += `<span class="source-type-badge grounded">${escapeHtml(event.data.source_type || 'GROUNDED')}</span>`;
+                    content += `<div style="margin-top: 0.5rem;">`;
+                    content += `<strong>Area of Law:</strong> ${escapeHtml(event.data.area_of_law || 'N/A')}<br>`;
+                    content += `<strong>Remedy Types:</strong> ${escapeHtml((event.data.remedy_types || []).join(', ') || 'None')}<br>`;
+                    content += `<strong>Organizations:</strong> ${escapeHtml((event.data.organizations || []).slice(0, 5).join(', ') || 'None')}<br>`;
+                    content += `<strong>Places:</strong> ${escapeHtml((event.data.places || []).slice(0, 5).join(', ') || 'None')}`;
+                    content += `</div>`;
+                    content += `<div style="margin-top: 0.25rem; font-size: 0.7rem; color: #718096;">Method: ${escapeHtml(event.data.extraction_method || 'NER')}</div>`;
+                    content += `</div>`;
+                }
+                // Tool calls with input data
+                else if (event.event === 'tool_call' && event.data) {
+                    content += `<div class="event-data-summary">`;
+                    content += `<strong>Tool:</strong> ${escapeHtml(event.data.tool || 'unknown')}`;
+                    if (event.data.context_length) {
+                        content += ` <span style="color: #718096; font-size: 0.75rem;">(${event.data.context_length} chars)</span>`;
+                    }
+                    content += `</div>`;
+
+                    // Full content (hidden by default)
+                    content += `<div class="event-data-full">`;
+                    if (event.data.input) {
+                        content += `<div class="tool-input"><strong>Input:</strong><pre>${escapeHtml(JSON.stringify(event.data.input, null, 2))}</pre></div>`;
+                    }
+                    if (event.data.input_preview) {
+                        content += `<div class="tool-preview"><strong>Context Preview:</strong><div class="preview-content">${escapeHtml(event.data.input_preview)}</div></div>`;
+                    }
+                    content += `</div>`;
+                }
+                // Default data display
+                else if (event.event !== 'agent_complete') {
+                    content += `<div class="event-data">${escapeHtml(JSON.stringify(event.data, null, 2))}</div>`;
+                }
+            }
+
+            div.innerHTML = content;
+
+            // Add click handler for expandable events
+            if (hasExpandableContent) {
+                div.addEventListener('click', function(e) {
+                    // Don't expand if clicking on a clickable-case element
+                    if (e.target.closest('.clickable-case')) return;
+
+                    const isExpanded = this.dataset.expanded === 'true';
+                    this.dataset.expanded = isExpanded ? 'false' : 'true';
+
+                    const indicator = this.querySelector('.expand-indicator');
+                    if (indicator) {
+                        indicator.textContent = isExpanded ? '+ Click to expand' : '- Click to collapse';
+                    }
+                });
+            }
+
+            return div;
+        }
+
+        async function runAgentStream(question) {
+            const activityDiv = document.getElementById('agent-activity');
+            const statusSpan = document.getElementById('agent-status');
+            const ragContent = document.getElementById('rag-content');
+
+            activityDiv.innerHTML = '';
+            statusSpan.textContent = '(running...)';
+            statusSpan.className = 'agent-status running';
+            ragContent.innerHTML = '<p class="loading">Waiting for agent analysis...</p>';
+
+            let finalResult = null;
+
+            try {
+                // Include conversation_id and profile_id for memory tracking
+                let url = `/api/agent/stream?question=${encodeURIComponent(question)}&conversation_id=${encodeURIComponent(currentConversationId)}`;
+                if (currentProfileId) {
+                    url += `&profile_id=${encodeURIComponent(currentProfileId)}`;
+                }
+                const eventSource = new EventSource(url);
+
+                return new Promise((resolve, reject) => {
+                    eventSource.onmessage = (e) => {
+                        try {
+                            const event = JSON.parse(e.data);
+
+                            // Handle stream end
+                            if (event.event === 'stream_end') {
+                                eventSource.close();
+                                statusSpan.textContent = '(complete)';
+                                statusSpan.className = 'agent-status complete';
+                                resolve(finalResult);
+                                return;
+                            }
+
+                            // Create and append event element
+                            const eventEl = createAgentEventElement(event);
+                            activityDiv.appendChild(eventEl);
+                            activityDiv.scrollTop = activityDiv.scrollHeight;
+
+                            // Capture final answer with sources
+                            if (event.event === 'agent_complete' && event.agent === 'supervisor') {
+                                if (event.data) {
+                                    finalResult = {
+                                        answer: event.data.final_answer,
+                                        sources: event.data.grounded_sources || [],
+                                        metadata: event.data.grounded_metadata || {}
+                                    };
+                                }
+                            }
+
+                            // Handle errors
+                            if (event.event === 'error') {
+                                statusSpan.textContent = '(error)';
+                                statusSpan.className = 'agent-status error';
+                            }
+
+                        } catch (parseError) {
+                            console.error('Error parsing event:', parseError);
+                        }
+                    };
+
+                    eventSource.onerror = (err) => {
+                        eventSource.close();
+                        statusSpan.textContent = '(error)';
+                        statusSpan.className = 'agent-status error';
+                        reject(new Error('Stream connection error'));
+                    };
+                });
+
+            } catch (error) {
+                statusSpan.textContent = '(error)';
+                statusSpan.className = 'agent-status error';
+                throw error;
+            }
+        }
+
+        // ============================================
+        // Event Handlers
+        // ============================================
+
+        async function handleAskSubmit(e) {
+            e.preventDefault();
+            const question = document.getElementById('question-input').value.trim();
+            const mode = document.getElementById('mode-select').value;
+            const agentMode = document.getElementById('agent-mode-toggle').checked;
+
+            if (!question) {
+                alert('Please enter a question.');
+                return;
+            }
+
+            const btn = document.getElementById('ask-btn');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            if (agentMode) {
+                // Use agent streaming
+                try {
+                    const result = await runAgentStream(question);
+
+                    // Increment conversation message count
+                    conversationMessageCount++;
+                    updateConversationIndicator();
+
+                    // Update RAG panel with final answer and sources
+                    const ragContent = document.getElementById('rag-content');
+                    if (result && result.answer) {
+                        let html = `
+                            <div class="answer-section">
+                                <h3>Question:</h3>
+                                <p class="question-text">${escapeHtml(question)}</p>
+
+                                <div class="answer-label">
+                                    <span class="source-type-badge generated">LLM SYNTHESIZED</span>
+                                    <span style="margin-left: 0.5rem; font-size: 0.8rem; color: #718096;">Based on ${result.sources?.length || 0} corpus sources</span>
+                                </div>
+                                <div class="answer-text">${escapeHtml(result.answer)}</div>
+                            </div>
+                        `;
+
+                        // Add grounded sources section
+                        if (result.sources && result.sources.length > 0) {
+                            html += `
+                                <div class="grounded-sources-section">
+                                    <h3><span class="source-type-badge grounded">GROUNDED SOURCES</span> Case Law Citations</h3>
+                                    <p class="sources-note">The above answer was synthesized from these passages retrieved from the legal corpus:</p>
+                                    <div class="source-list">
+                            `;
+                            for (const src of result.sources) {
+                                html += `
+                                    <div class="source-item">
+                                        <div class="source-name clickable-case" onclick="openCasePanel('${escapeHtml(src.case_id)}')">${src.rank ? '#' + src.rank + ' ' : ''}${escapeHtml(src.case_name || 'Unknown Case')}</div>
+                                        <div class="source-id">${escapeHtml(src.case_id || '')}</div>
+                                        <div class="source-snippet">${escapeHtml(src.snippet?.substring(0, 300) || '')}...</div>
+                                    </div>
+                                `;
+                            }
+                            html += `</div></div>`;
+                        }
+
+                        // Add grounded metadata section
+                        if (result.metadata && (result.metadata.area_of_law || result.metadata.organizations?.length > 0)) {
+                            html += `
+                                <div class="grounded-metadata-section">
+                                    <h3><span class="source-type-badge grounded">EXTRACTED METADATA</span></h3>
+                                    <div class="metadata-grid">
+                                        <div><strong>Area of Law:</strong> ${escapeHtml(result.metadata.area_of_law || 'Not classified')}</div>
+                                        <div><strong>Remedy Types:</strong> ${escapeHtml((result.metadata.remedy_types || []).join(', ') || 'None identified')}</div>
+                                        <div><strong>Organizations:</strong> ${escapeHtml((result.metadata.organizations || []).join(', ') || 'None identified')}</div>
+                                        <div><strong>Places:</strong> ${escapeHtml((result.metadata.places || []).join(', ') || 'None identified')}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        ragContent.innerHTML = html;
+                    } else {
+                        ragContent.innerHTML = '<p class="error">No answer generated. Check agent activity for details.</p>';
+                    }
+
+                } catch (error) {
+                    document.getElementById('rag-content').innerHTML =
+                        `<p class="error">Agent error: ${escapeHtml(error.message)}</p>`;
+                }
+
+            } else {
+                // Use direct RAG (non-agent mode)
+                document.getElementById('agent-activity').innerHTML =
+                    '<p class="placeholder">Agent Mode disabled. Using direct RAG query.</p>';
+                document.getElementById('agent-status').textContent = '';
+
+                document.getElementById('rag-content').innerHTML = '<p class="loading">Querying the legal corpus...</p>';
+
+                const result = await askQuestion(question, mode);
+                updateRAGPanel(result);
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Ask Question';
+        }
+
+        async function loadCase(caseId) {
+            if (!caseId) return;
+
+            document.getElementById('cluster-content').innerHTML = '<p class="loading">Loading case...</p>';
+            document.getElementById('metadata-content').innerHTML = '<p class="loading">Loading metadata...</p>';
+
+            const caseDetail = await fetchCaseDetail(caseId);
+            if (caseDetail) {
+                updateClusterPanel(caseDetail, true);
+                updateMetadataPanel(caseDetail);
+            }
+        }
+
+        async function loadCluster(clusterId) {
+            document.getElementById('cluster-content').innerHTML = '<p class="loading">Loading cluster...</p>';
+
+            const clusterDetail = await fetchClusterDetail(clusterId);
+            updateClusterPanel(clusterDetail, false);
+        }
+
+        // ============================================
+        // Utility Functions
+        // ============================================
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // Initialization
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Show loading state
+            document.getElementById('case-count').textContent = 'Loading...';
+            document.getElementById('cluster-list').innerHTML = '<p class="loading">Loading topics...</p>';
+
+            // Load initial data (cases, clusters, and profiles in parallel)
+            const [cases, clusters] = await Promise.all([
+                fetchCases(),
+                fetchClusters(),
+                refreshProfileSelect()
+            ]);
+
+            populateCaseSelect(cases);
+            updateClusterList(clusters);
+
+            // Set up event listeners
+            document.getElementById('ask-form').addEventListener('submit', handleAskSubmit);
+
+            // New conversation button
+            document.getElementById('new-conversation-btn').addEventListener('click', startNewConversation);
+
+            // Profile management
+            document.getElementById('profile-select').addEventListener('change', (e) => {
+                handleProfileChange(e.target.value);
+            });
+            document.getElementById('new-profile-btn').addEventListener('click', handleNewProfile);
+            document.getElementById('view-profile-btn').addEventListener('click', showProfileModal);
+
+            // Close modal on outside click
+            document.getElementById('profile-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'profile-modal') {
+                    closeProfileModal();
+                }
+            });
+
+            // Case search
+            document.getElementById('case-search').addEventListener('input', (e) => {
+                handleCaseSearch(e.target.value);
+            });
+
+            // Case select change
+            document.getElementById('case-select').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadCase(e.target.value);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
